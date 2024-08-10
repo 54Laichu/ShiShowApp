@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- 會員資訊欄 -->
+<div id="userCard" class="bg-gray-300 rounded-lg p-6 mb-6 text-center">
+  <!-- 未登入顯示 -->
+  <div id="unauthenticatedContent">
+    <p class="text-lg font-semibold text-gray-600">請登入會員</p>
+  </div>
+
+  <!-- 已登入顯示 -->
+  <div id="authenticatedContent" style="display: none;">
+    <p id="userInfo" class="text-lg font-semibold text-gray-600"></p>
+    <p id="userEmail" class="text-md text-gray-500 mt-1"></p>
+    <button id="logoutButton" class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">登出</button>
+  </div>
+</div>
+
+{% include "login.html" %}
+
+<!-- 精選教練課 -->
+<h2 class="text-xl font-bold mb-4">精選教練</h2>
+<div class="grid grid-cols-2 gap-4">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <img src="https://fakeimg.pl/300x200/010101,128/000,255/?text=瑜珈&font=noto" alt="瑜珈課程" class="w-full h-32 object-cover">
+    <div class="p-2">
+      <p class="font-semibold">瑜珈課程</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <img src="https://fakeimg.pl/300x200/010101,128/000,255/?text=重訓&font=noto" alt="重訓課程" class="w-full h-32 object-cover">
+    <div class="p-2">
+      <p class="font-semibold">重訓課程</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <img src="https://fakeimg.pl/300x200/010101,128/000,255/?text=有氧&font=noto" alt="有氧課程" class="w-full h-32 object-cover">
+    <div class="p-2">
+      <p class="font-semibold">有氧課程</p>
+    </div>
+  </div>
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <img src="https://fakeimg.pl/300x200/010101,128/000,255/?text=拳擊&font=noto" alt="拳擊課程" class="w-full h-32 object-cover">
+    <div class="p-2">
+      <p class="font-semibold">拳擊課程</p>
+    </div>
+  </div>
+</div>
+<script type="module" src="{{ url_for('static', path='/js/index.js') }}"></script>
+{% endblock %}
