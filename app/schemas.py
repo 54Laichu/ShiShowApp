@@ -1,0 +1,58 @@
+from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
+from datetime import datetime
+from typing import Optional, List
+
+class UserBase(SQLModel):
+    name: str
+    email: str = Field(unique=True, index=True)
+    phone: str = Field(unique=True)
+    is_active: bool = Field(default=True)
+
+class UserCreate(UserBase):
+    hashed_password: str
+    cities: List["City"] = Relationship(back_populates="users", link_model="UserCity")
+    course_categories: List["CourseCategory"] = Relationship(back_populates="users", link_model="CourseCategory")
+
+class CoachBase(SQLModel):
+    name: str
+    account: str = Field(unique=True, index=True)
+    email: str = Field(unique=True)
+    phone: str = Field(unique=True)
+    is_active: bool = Field(default=True)
+
+class CheckCity(Enum):
+    TPE = "臺北市"
+    NTP = "新北市"
+    KEL = "基隆市"
+    TUN = "桃園市"
+    HSC = "新竹縣"
+    HS = "新竹市"
+    MLC = "苗栗縣"
+    TC = "臺中市"
+    NTC = "南投縣"
+    CH = "彰化縣"
+    YL = "雲林縣"
+    CY = "嘉義縣"
+    CYI = "嘉義市"
+    TN = "臺南市"
+    KS = "高雄市"
+    PT = "屏東縣"
+    IL = "宜蘭縣"
+    HL = "花蓮縣"
+    TD = "臺東縣"
+    PH = "澎湖縣"
+    KM = "金門縣"
+    LJG = "連江縣"
+
+class CheckCourseCategory(Enum):
+    WEIGHT_TRAINING = "重量訓練"
+    SPINNING = "飛輪"
+    MUSCLE_STRETCHING = "肌肉伸展"
+    BOXING_AEROBICS = "拳擊有氧"
+    MIXED_MARTIAL_ARTS = "綜合格鬥"
+    INTERVAL_TRAINING = "間歇訓練"
+    CIRCUIT_TRAINING = "環狀訓練"
+    YOGA = "瑜伽"
+    SELF_DEFENSE = "防身術"
+    OTHER = "其他"

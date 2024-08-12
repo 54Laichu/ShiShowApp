@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
 from typing import Optional, List
+from app.schemas import UserBase, CoachBase
 # 需要留意 table models 之間引入先後順序的問題
 
 class UserCity(SQLModel, table=True):
@@ -20,7 +21,7 @@ class UserCoach(SQLModel, table=True):
 
 class City(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
+    name: str = Field(unique=True, index=True)
     users: List["User"] = Relationship(back_populates="cities", link_model=UserCity)
     coaches: List["Coach"] = Relationship(back_populates="cities", link_model=CoachCity)
 
@@ -34,7 +35,7 @@ class CoachCourseCategory(SQLModel, table=True):
 
 class CourseCategory(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
+    name: str = Field(unique=True, index=True)
     description: Optional[str] = None
     users: List["User"] = Relationship(back_populates="course_categories", link_model=UserCourseCategory)
     coaches: List["Coach"] = Relationship(back_populates="course_categories", link_model=CoachCourseCategory)
@@ -57,8 +58,8 @@ class Certificate(SQLModel, table=True):
 
 class Gym(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-    name: str
-    address: str
+    name: str = Field(unique=True)
+    address: str = Field(unique=True)
     city_id: int = Field(foreign_key="city.id")
     city: City = Relationship()
     coach_gyms: List["CoachGym"] = Relationship(back_populates="gym")
@@ -69,24 +70,12 @@ class CoachGym(SQLModel, table=True):
     coach: "Coach" = Relationship(back_populates="coach_gyms")
     gym: Gym = Relationship(back_populates="coach_gyms")
 
-class UserBase(SQLModel):
-    name: str
-    email: str = Field(index=True)
-    phone: str
-    is_active: bool = Field(default=True)
-
 class User(UserBase, table=True):
     id: int = Field(default=None, primary_key=True)
     hashed_password: str
     coaches: List["Coach"] = Relationship(back_populates="users", link_model=UserCoach)
     cities: List["City"] = Relationship(back_populates="users", link_model=UserCity)
     course_categories: List["CourseCategory"] = Relationship(back_populates="users", link_model=UserCourseCategory)
-
-class CoachBase(SQLModel):
-    name: str
-    account: str = Field(index=True)
-    phone: str
-    is_active: bool = Field(default=True)
 
 class Coach(CoachBase, table=True):
     id: int = Field(default=None, primary_key=True)
