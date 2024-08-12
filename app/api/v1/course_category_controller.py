@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from app.schemas import CheckCourseCategory
 from app.models import CourseCategory
-from sqlmodel import Session, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.database import get_session
 
 
 router = APIRouter()
 
 @router.get("/course_categories")
-async def index(db: Session = Depends(get_session)) -> list:
-    statement = select(CourseCategory)  # 使用 select 來查詢所有 CourseCategory
-    result = db.execute(statement)  # 執行查詢
-    course_categories = result.scalars().all()  # 獲取結果並轉換為列表
+async def index(db: AsyncSession = Depends(get_session)) -> list:
+    result = await db.execute(select(CourseCategory))
+    course_categories = result.scalars().all()  # scalars() 是 sqlalchemy Result object 的方法，可以將回傳資料轉換成 list
     return course_categories
 

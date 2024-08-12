@@ -9,5 +9,11 @@ VALUES ("臺北市"), ("新北市"), ("基隆市"), ("桃園市"), ("新竹縣")
 - INSERT INTO course_category (name)
 VALUES ("重量訓練"), ("飛輪"), ("肌肉伸展"), ("拳擊有氧"), ("綜合格鬥"), ("間歇訓練"), ("環狀訓練"), ("瑜伽"), ("防身術"), ("其他");
 
+#### DB 改非同步連線
+- app/database.py
+- alembic init --template async ./migrations  https://ithelp.ithome.com.tw/articles/10330152?sc=rss.iron
+- 將 UserService methods改成 async
+- pip install greenlet 管理 SQLAlchemy 中的 AsyncSession https://habr.com/en/articles/767532/
+
 #### Alembic migration
 - alembic revision --autogenerate -m "add unique True to cloumns"
