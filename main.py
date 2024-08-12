@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from app.api.v1 import user_controller
+from app.api.v1 import user_controller, course_category_controller
 
 app = FastAPI()
 
@@ -19,6 +19,11 @@ async def favicon():
 @app.get("/", include_in_schema=False)
 async def index(request: Request):
   return templates.TemplateResponse("index.html", {"request": request})
+@app.get("/register", include_in_schema=False)
+async def create(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 
 app.include_router(user_controller.router, prefix="/api/v1", tags=["User"])
+app.include_router(course_category_controller.router, prefix="/api/v1", tags=["CourseCategory"])
+
