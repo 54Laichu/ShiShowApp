@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from app.api.v1 import user_controller, course_category_controller
+from app.api.v1 import user_controller, course_category_controller, city_controller
 
 app = FastAPI()
 
@@ -12,7 +12,7 @@ app.mount("/static", StaticFiles(directory="./app/static"), name="static")
 # https://fastapi.tiangolo.com/reference/templating/
 templates = Jinja2Templates(directory=["./app/templates", "./app/views"])
 
-@app.get("/favicon.ico")
+@app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
   return RedirectResponse(url="/static/favicon.ico")
 
@@ -26,4 +26,5 @@ async def create(request: Request):
 
 app.include_router(user_controller.router, prefix="/api/v1", tags=["User"])
 app.include_router(course_category_controller.router, prefix="/api/v1", tags=["CourseCategory"])
+app.include_router(city_controller.router, prefix="/api/v1", tags=["City"])
 

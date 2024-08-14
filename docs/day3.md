@@ -17,3 +17,20 @@ VALUES ("重量訓練"), ("飛輪"), ("肌肉伸展"), ("拳擊有氧"), ("綜�
 
 #### Alembic migration
 - alembic revision --autogenerate -m "add unique True to cloumns"
+- alembic revision --autogenerate -m "add created_at updated_at to User and Coach"
+
+### APIs
+- user_controller.py
+  - POST `api/v1/user` 建立新使用者
+    - `get_user_by_phone_email 在輸入 DB 前先檢查是否有重複資料
+    - 在 UserService 新增 create_user() 方法
+    - 在 UserAuthService 新增 create_access_token() 方法，如果使用者創建成功，就建立並回傳 jwt token
+  - GET `api/v1/cities` fetch 城市 list
+  - GET `api/v1/course_categories` fetch 課程類型 list
+
+### 前端
+- inner_base.html (內分頁套用的 template)
+- inner_header.html (內分頁套用的 template)
+- register.html
+- registerForm.js
+- fetchData.js (撈 city, usercoursecategory 資料)

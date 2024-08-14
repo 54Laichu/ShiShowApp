@@ -10,3 +10,5 @@ pydantic_settings
 aiomysql
 bcrypt
 greenlet
+email-validator
+PyJWT

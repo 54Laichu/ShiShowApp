@@ -2,22 +2,29 @@ from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 from datetime import datetime
 from typing import Optional, List
+from pydantic import EmailStr
 
 class UserBase(SQLModel):
     name: str
-    email: str = Field(unique=True, index=True)
+    email: EmailStr = Field(unique=True, index=True)
     phone: str = Field(unique=True)
     is_active: bool = Field(default=True)
 
 class UserCreate(UserBase):
-    hashed_password: str
-    cities: List["City"] = Relationship(back_populates="users", link_model="UserCity")
-    course_categories: List["CourseCategory"] = Relationship(back_populates="users", link_model="CourseCategory")
+    password: str
+    cities: List[str]
+    course_categories: List[str]
+
+class UserRead(UserBase):
+    name: str
+    email: str
+    cities: List[str]
+    course_catrgories: List[str]
 
 class CoachBase(SQLModel):
     name: str
     account: str = Field(unique=True, index=True)
-    email: str = Field(unique=True)
+    email: EmailStr = Field(unique=True, index=True)
     phone: str = Field(unique=True)
     is_active: bool = Field(default=True)
 

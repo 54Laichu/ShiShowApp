@@ -1,7 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from app.models import User, CourseCategory, City
 from app.schemas import UserCreate, CheckCity, CheckCourseCategory
 from app.helpers.password_hash import get_password_hash
+from app.services.user_auth_service import UserAuthService
 
 class UserService:
     def __init__(self, db: AsyncSession):
@@ -9,7 +11,7 @@ class UserService:
 
     async def create_user(self, user: UserCreate) -> User:
         db_user = User(
-            username=user.username,
+            name=user.name,
             email=user.email,
             phone=user.phone,
             hashed_password=get_password_hash(user.password),
@@ -18,24 +20,35 @@ class UserService:
 
         if user.cities:
             for city in user.cities:
-                if city.name in CheckCity.__members__:
-                    # 如果有在 enum 中，再查詢資料庫
-                    db_city = await self.db.query(City).filter_by(name=city.name).first()
+                if city in [item.value for item in CheckCity]:
+                    db_city = await self.db.execute(select(City).filter(City.name == city))
+                    db_city = db_city.scalar_one_or_none()
                     if db_city:
                         db_user.cities.append(db_city)
+                    else:
+                        raise ValueError(f"系統錯誤，請向客服人員聯繫")
                 else:
-                    raise ValueError(f"查無{city.name}")
+                    raise ValueError(f"查無：{city}")
 
         if user.course_categories:
             for category in user.course_categories:
-                if category.name in CheckCourseCategory.__members__:
-                    # 如果有在 enum 中，再查詢資料庫
-                    db_city = await self.db.query(CourseCategory).filter_by(name=category.name).first()
-                    if db_city:
-                        db_user.cities.append(db_city)
+                if category in [item.value for item in CheckCourseCategory]:
+                    db_category = await self.db.execute(select(CourseCategory).filter(CourseCategory.name == category))
+                    db_category = db_category.scalar_one_or_none()
+                    if db_category:
+                        db_user.course_categories.append(db_category)
+                    else:
+                        raise ValueError(f"系統錯誤，請向客服人員聯繫")
                 else:
-                    raise ValueError(f"查無{category.name}")
+                    raise ValueError(f"查無：{category}")
 
-        await self.db.add(db_user)
+        self.db.add(db_user)
         await self.db.commit()
         await self.db.refresh(db_user)
+        print(db_user.id)
+        token = UserAuthService.create_access_token(db_user.id)
+        return token
+
+    async def get_user_by_phone_email(self, email: str, phone: str) -> User | None:
+        result = await self.db.execute(select(User).filter((User.email == email) | (User.phone == phone)))
+        return result.scalar_one_or_none()

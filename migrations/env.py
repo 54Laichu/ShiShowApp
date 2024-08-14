@@ -4,6 +4,7 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from sqlmodel import SQLModel
 from app.settings.config import settings
+from sqlalchemy.engine import Connection
 from app.models import User, Coach, UserCoach, City, UserCity, CoachCity, CourseCategory, UserCourseCategory, CoachCourseCategory, CoachPhoto, Certificate, Gym, CoachGym
 
 from alembic import context

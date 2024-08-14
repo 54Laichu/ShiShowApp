@@ -76,6 +76,8 @@ class User(UserBase, table=True):
     coaches: List["Coach"] = Relationship(back_populates="users", link_model=UserCoach)
     cities: List["City"] = Relationship(back_populates="users", link_model=UserCity)
     course_categories: List["CourseCategory"] = Relationship(back_populates="users", link_model=UserCourseCategory)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Coach(CoachBase, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -88,3 +90,5 @@ class Coach(CoachBase, table=True):
     certificates: List["Certificate"] = Relationship(back_populates="coach")
     photos: List["CoachPhoto"] = Relationship(back_populates="coach")
     coach_gyms: List["CoachGym"] = Relationship(back_populates="coach")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
