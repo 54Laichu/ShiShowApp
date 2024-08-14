@@ -116,7 +116,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 console.log("Token before storing:", token);
                 localStorage.setItem('token', token);
                 console.log("Token after storing:", localStorage.getItem('token'));
-                // window.location.href = '/';
+                alert('註冊成功！')
+                window.location.href = '/';
             } else {
                 let errorMessage = "信箱已註冊";
                 try {
