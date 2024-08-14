@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from typing import Optional
 from app.models import User, CourseCategory, City
 from app.schemas import UserCreate, CheckCity, CheckCourseCategory
 from app.helpers.password_hash import get_password_hash
@@ -49,6 +50,6 @@ class UserService:
         token = UserAuthService.create_access_token(db_user.id)
         return token
 
-    async def get_user_by_phone_email(self, email: str, phone: str) -> User | None:
+    async def get_user_by_phone_email(self, email: Optional[str], phone: Optional[str]) -> User | None:
         result = await self.db.execute(select(User).filter((User.email == email) | (User.phone == phone)))
         return result.scalar_one_or_none()

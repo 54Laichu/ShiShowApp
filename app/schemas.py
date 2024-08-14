@@ -15,11 +15,18 @@ class UserCreate(UserBase):
     cities: List[str]
     course_categories: List[str]
 
-class UserRead(UserBase):
+class UserRead(SQLModel):
     name: str
     email: str
     cities: List[str]
     course_catrgories: List[str]
+
+    class Config:
+        orm_mode = True
+
+class UserLogin(SQLModel):
+    email: EmailStr
+    password: str
 
 class CoachBase(SQLModel):
     name: str
