@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field
 from enum import Enum
 from datetime import datetime
 from typing import Optional, List
@@ -15,11 +15,28 @@ class UserCreate(UserBase):
     cities: List[str]
     course_categories: List[str]
 
-class UserRead(SQLModel):
+class UserUpdate(SQLModel):
+    name: Optional[str] = None
+    password: Optional[str] = None
+    cities: Optional[List[str]] = None
+    course_categories: Optional[List[str]] = None
+    coaches: Optional[List[str]] = None
+
+class UserPassport(SQLModel):
+    id: int
     name: str
     email: str
-    cities: List[str]
-    course_catrgories: List[str]
+
+    class Config:
+        orm_mode = True
+
+class UserRead(SQLModel):
+    id: int
+    name: str
+    email: str
+    cities: Optional[List[str]] = None
+    course_catrgories: Optional[List[str]] = None
+    coaches: Optional[List[str]] = None
 
     class Config:
         orm_mode = True

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <!-- 會員資訊欄 -->
-<div id="userCard" class="bg-gray-300 rounded-lg p-6 mb-6 text-center">
+<div id="userCard" class="bg-gray-300 rounded-lg p-6 mb-6 text-center cursor-pointer">
   <!-- 未登入顯示 -->
   <div id="unauthenticatedContent">
     <p class="text-lg font-semibold text-gray-600">請登入會員</p>
@@ -13,7 +13,7 @@
     <p id="userEmail" class="text-md text-gray-500 mt-1"></p>
     <button id="logoutButton" class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">登出</button>
   </div>
-</div>
+</div>-
 
 {% include "login.html" %}
 

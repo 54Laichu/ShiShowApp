@@ -113,9 +113,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 			if (response.ok) {
 				const responseData = await response.json();
 				const token = responseData.access_token;
-				console.log("Token before storing:", token);
 				localStorage.setItem('token', token);
-				console.log("Token after storing:", localStorage.getItem('token'));
 				alert('註冊成功！')
 				window.location.href = '/';
 			} else {

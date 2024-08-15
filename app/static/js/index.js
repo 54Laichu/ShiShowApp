@@ -13,39 +13,39 @@ async function initApp() {
 }
 
 function showAuthenticatedUI(userData) {
-	document.getElementById('userInfo').textContent = `歡迎，${userData.username}`;
-	document.getElementById('userEmail').textContent = userData.email;
-	document.getElementById('authenticatedContent').style.display = 'block';
-	document.getElementById('unauthenticatedContent').style.display = 'none';
-	document.getElementById('loginFormModal').style.display = 'none';
+	document.querySelector('#userInfo').textContent = `歡迎，${userData.name}`;
+	document.querySelector('#userEmail').textContent = userData.email;
+	document.querySelector('#authenticatedContent').style.display = 'block';
+	document.querySelector('#unauthenticatedContent').style.display = 'none';
+	document.querySelector('#loginFormModal').style.display = 'none';
 }
 
 function showUnauthenticatedUI() {
-	document.getElementById('authenticatedContent').style.display = 'none';
-	document.getElementById('unauthenticatedContent').style.display = 'block';
-	document.getElementById('loginFormModal').style.display = 'none';
+	document.querySelector('#authenticatedContent').style.display = 'none';
+	document.querySelector('#unauthenticatedContent').style.display = 'block';
+	document.querySelector('#loginFormModal').style.display = 'none';
 }
 
 function showLoginForm() {
-	document.getElementById('loginFormModal').style.display = 'block';
+	document.querySelector('#loginFormModal').style.display = 'block';
 }
 
 function hideLoginForm() {
-	document.getElementById('loginFormModal').style.display = 'none';
+	document.querySelector('#loginFormModal').style.display = 'none';
 }
 
 function redirectToRegister() {
   window.location.href = '/register';
 }
 
-document.getElementById('unauthenticatedContent').addEventListener('click', showLoginForm);
-document.getElementById('closeLoginForm').addEventListener('click', hideLoginForm);
-document.getElementById('showRegisterForm').addEventListener('click', redirectToRegister);
+document.querySelector('#unauthenticatedContent').addEventListener('click', showLoginForm);
+document.querySelector('#closeLoginForm').addEventListener('click', hideLoginForm);
+document.querySelector('#showRegisterForm').addEventListener('click', redirectToRegister);
 
-document.getElementById('loginForm').addEventListener('submit', async (event) => {
+document.querySelector('#loginForm').addEventListener('submit', async (event) => {
   event.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.querySelector('#email').value;
+  const password = document.querySelector('#password').value;
 
   try {
     await auth.login(email, password);
@@ -56,13 +56,13 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
   }
 });
 
-document.getElementById('logoutButton').addEventListener('click', () => {
+document.querySelector('#logoutButton').addEventListener('click', () => {
 	auth.logout();
 	showUnauthenticatedUI();
 });
 
 window.onclick = function(event) {
-	if (event.target == document.getElementById('loginFormModal')) {
+	if (event.target == document.querySelector('#loginFormModal')) {
 		hideLoginForm();
 	}
 }

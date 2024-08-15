@@ -12,11 +12,11 @@
 <body class="bg-gray-100 font-sans">
   <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
       <div class="flex justify-between items-center p-4">
-          <div class="flex items-center">
+          <a href="/" class="flex items-center">
               <div class="bg-orange-200 p-2 rounded">
                   <span class="text-xl font-bold text-[#352c1d]">ShiShow</span>
               </div>
-          </div>
+          </a>
           <div class="flex space-x-4">
               <div class="w-6 h-6 flex items-center justify-center rounded">
                 <i data-feather="bell"></i>
@@ -27,7 +27,7 @@
           </div>
       </div>
   </header>
-  <main class="mt-16 mb-20 p-4">
+  <main class="mt-20 mb-20 p-4">
     {% block content %}{% endblock %}
   </main>
   {% include 'navbar.html' %}

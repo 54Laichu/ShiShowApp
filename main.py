@@ -22,6 +22,9 @@ async def index(request: Request):
 @app.get("/register", include_in_schema=False)
 async def create(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
+@app.get("/user", include_in_schema=False)
+async def create(request: Request):
+    return templates.TemplateResponse("user_center.html", {"request": request})
 
 
 app.include_router(user_controller.router, prefix="/api/v1", tags=["User"])
