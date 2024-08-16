@@ -11,7 +11,7 @@ class UserAuth {
 		}
 
 		try {
-			const response = await this.fetch(`${this.baseUrl}/user/auth`, {
+			const response = await fetch(`${this.baseUrl}/user/auth`, {
 				method: 'GET',
 				headers: { "Authorization": `Bearer ${this.token}`,},
 			});
