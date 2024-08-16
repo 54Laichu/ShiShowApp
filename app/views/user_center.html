@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+  <main class="container mx-auto px-4 py-8 mb-20">
+    {% include "login.html" %}
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">個人資訊</h2>
+      <form id="updateUserForm">
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>姓名：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <span id="userName" class="mr-4"></span>
+            <input type="text" id="editName" name="name" class="hidden w-full rounded-md bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+          </div>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>Email：</strong>
+          </div>
+          <div class="w-2/4">
+            <span id="userEmail"></span>
+          </div>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>密碼：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <span id="passwordPlaceholder" class="mr-4">••••••••</span>
+            <input type="password" id="editPassword" name="password" class="hidden w-full rounded-md border-black bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="editButton" class="bg-orange-200 text-gray px-4 py-2 rounded hover:bg-orange-600 transition duration-300">
+            編輯帳號密碼
+          </button>
+          <button type="submit" id="saveButton" class="hidden bg-green-100 text-green-800 px-4 py-2 rounded hover:bg-green-300 transition duration-300">確定更改</button>
+          <button type="button" id="cancelEdit" class="hidden bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition duration-300">取消</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- user cities -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">可上課地區</h2>
+        <button id="editCities" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="userCities" class="flex flex-wrap gap-2">
+      </div>
+    </section>
+
+    <!-- user coursecategories -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">感興趣的課程</h2>
+        <button id="editCategories" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="userCourseCategories" class="flex flex-wrap gap-2">
+      </div>
+    </section>
+
+    <!-- 已綁定教練清單 -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">已綁定教練</h2>
+      <ul id="trainerList" class="space-y-4">
+        <li class="flex justify-between items-center">
+          <span>陳教練（瑜珈）</span>
+          <div>
+            <button onclick="sendMessage('陳教練')" class="text-gray-500 hover:text-orange-700 mr-2">
+              <i data-feather="message-square"></i>
+            </button>
+            <button onclick="unbindTrainer('陳教練')" class="text-red-500 hover:text-red-700">
+              <i data-feather="user-minus"></i>
+            </button>
+          </div>
+        </li>
+        <li class="flex justify-between items-center">
+          <span>李教練（重訓）</span>
+          <div>
+            <button onclick="sendMessage('李教練')" class="text-gray-500 hover:text-orange-700 mr-2">
+              <i data-feather="message-square"></i>
+            </button>
+            <button onclick="unbindTrainer('李教練')" class="text-red-500 hover:text-red-700">
+              <i data-feather="user-minus"></i>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <div id="logoutButton" class="bg-red-500 rounded-lg p-6 text-center cursor-pointer hover:bg-red-600">
+      <button class="text-white rounded">登出</button>
+    </div>
+  </main>
+
+  {% include 'navbar.html' %}
+  <script type="module" src="{{ url_for('static', path='/js/userCenter.js') }}"></script>
+{% endblock %}
