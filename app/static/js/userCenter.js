@@ -77,9 +77,9 @@ document.querySelector('#showRegisterForm').addEventListener('click', redirectTo
 
 // Edit form----------------------
 function setupEditForm() {
-  const editButton = document.querySelector('#editButton');
-  const saveButton = document.querySelector('#saveButton');
-  const cancelEdit = document.querySelector('#cancelEdit');
+  const editUserButton = document.querySelector('#editUserButton');
+  const saveUserButton = document.querySelector('#saveUserButton');
+  const cancelUserEdit = document.querySelector('#cancelUserEdit');
   const editName = document.querySelector('#editName');
   const editPassword = document.querySelector('#editPassword');
   const userName = document.querySelector('#userName');
@@ -92,9 +92,9 @@ function setupEditForm() {
     editPassword.classList.remove('hidden');
     userName.classList.add('hidden');
     passwordPlaceholder.classList.add('hidden');
-    editButton.classList.add('hidden');
-    saveButton.classList.remove('hidden');
-    cancelEdit.classList.remove('hidden');
+    editUserButton.classList.add('hidden');
+    saveUserButton.classList.remove('hidden');
+    cancelUserEdit.classList.remove('hidden');
   }
 
   function exitEditMode() {
@@ -102,13 +102,13 @@ function setupEditForm() {
     editPassword.classList.add('hidden');
     userName.classList.remove('hidden');
     passwordPlaceholder.classList.remove('hidden');
-    editButton.classList.remove('hidden');
-    saveButton.classList.add('hidden');
-    cancelEdit.classList.add('hidden');
+    editUserButton.classList.remove('hidden');
+    saveUserButton.classList.add('hidden');
+    cancelUserEdit.classList.add('hidden');
   }
 
-  editButton.addEventListener('click', enterEditMode);
-  cancelEdit.addEventListener('click', exitEditMode);
+  editUserButton.addEventListener('click', enterEditMode);
+  cancelUserEdit.addEventListener('click', exitEditMode);
 
   updateUserForm.addEventListener('submit', async (event) => {
     event.preventDefault();
