@@ -61,6 +61,11 @@ class CoachBase(SQLModel):
     phone: str = Field(unique=True)
     is_active: bool = Field(default=True)
 
+class CoachCreate(CoachBase):
+    password: str
+    cities: List[str]
+    course_categories: List[str]
+
 class CheckCity(Enum):
     TPE = "臺北市"
     NTP = "新北市"
