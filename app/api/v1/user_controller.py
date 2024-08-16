@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import JSONResponse
-from app.schemas import UserCreate, UserRead, UserLogin, UserUpdate, UserPassport, UserCitiesUpdate
+from app.schemas import UserCreate, UserRead, UserLogin, UserUpdate, UserPassport, UserCitiesUpdate, UserCourseCategoriessUpdate
 from app.services.user_service import UserService
 from app.services.user_auth_service import UserAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,6 +39,20 @@ async def update_user(update_data: UserCitiesUpdate, auth_header: Annotated[str,
         if auth_user:
             user_id = auth_user.id
             updated_user = await UserService(db).update_user_cities(user_id, update_data)
+            return updated_user
+        else:
+            return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
+    except Exception as e:
+        print(f"Error updating user: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+@router.put("/user_course_category", response_model=UserCourseCategoriessUpdate)
+async def update_user(update_data: UserCourseCategoriessUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        auth_user = await UserAuthService(db).verify_current_user(auth_header)
+        if auth_user:
+            user_id = auth_user.id
+            updated_user = await UserService(db).update_user_course_categories(user_id, update_data)
             return updated_user
         else:
             return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})

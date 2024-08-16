@@ -94,7 +94,7 @@ class UserAuth {
 
   async updateUserCourseCategories(courseCategories, url) {
     if (!Array.isArray(courseCategories)) {
-      throw new Error('Course categories must be an array');
+      throw new Error('格式錯誤(要是 Array)');
     }
     return this._sendUpdateRequest({ course_categories: courseCategories }, url);
 	}

@@ -22,8 +22,14 @@ class UserUpdate(SQLModel):
 class UserCitiesUpdate(SQLModel):
     cities: List[str]
 
+    class Config:
+        orm_mode = True
+
 class UserCourseCategoriessUpdate(SQLModel):
     course_categories: List[str]
+
+    class Config:
+        orm_mode = True
 
 class UserPassport(SQLModel):
     id: int
