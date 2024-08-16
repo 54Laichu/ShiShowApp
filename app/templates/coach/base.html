@@ -12,9 +12,9 @@
 <body class="bg-gray-100 font-sans">
   <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
       <div class="flex justify-between items-center p-4">
-          <a href="/" class="flex items-center">
-              <div class="bg-orange-200 p-2 rounded">
-                  <span class="text-xl font-bold text-[#352c1d]">ShiShow</span>
+          <a href="/coach" class="flex items-center">
+              <div class="bg-green-200 p-2 rounded">
+                  <span class="text-xl font-bold text-[#352c1d]">ShiShow 教練管理平台</span>
               </div>
           </a>
           <div class="flex space-x-4">
@@ -30,7 +30,7 @@
   <main class="mt-20 mb-20 p-4">
     {% block content %}{% endblock %}
   </main>
-    {% include 'navbar.html' %}
+    {% include 'coach/navbar.html' %}
 <script>
   feather.replace()
 </script>

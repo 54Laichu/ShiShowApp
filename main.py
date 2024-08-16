@@ -16,15 +16,21 @@ templates = Jinja2Templates(directory=["./app/templates", "./app/views"])
 async def favicon():
   return RedirectResponse(url="/static/favicon.ico")
 
+# users frontend
 @app.get("/", include_in_schema=False)
 async def index(request: Request):
   return templates.TemplateResponse("index.html", {"request": request})
 @app.get("/register", include_in_schema=False)
 async def create(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
-@app.get("/user", include_in_schema=False)
+@app.get("/user_center", include_in_schema=False)
 async def create(request: Request):
     return templates.TemplateResponse("user_center.html", {"request": request})
+
+# coaches frontend
+@app.get("/coach", include_in_schema=False)
+async def index(request: Request):
+  return templates.TemplateResponse("coach/index.html", {"request": request})
 
 
 app.include_router(user_controller.router, prefix="/api/v1", tags=["User"])

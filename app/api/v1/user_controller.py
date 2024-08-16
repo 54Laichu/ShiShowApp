@@ -6,7 +6,7 @@ from app.services.user_auth_service import UserAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from typing import Any, List, Annotated
+from typing import Any, Annotated
 
 router = APIRouter()
 
