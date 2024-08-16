@@ -1,4 +1,5 @@
 import UserAuth from './modules/userAuth.js';
+import { fetchCities, fetchCourseCategories } from "./modules/fetchData.js";
 
 const auth = new UserAuth('/api/v1');
 
@@ -11,7 +12,8 @@ async function initApp() {
     showUserCities(userData.cities, userCities)
     showUserCourseCategories(userData.course_catrgories, userCourseCategories)
     // console.log(userData);
-    setupEditForm();
+    editUserForm();
+    editCityForm();
 	} catch (error) {
     console.error(error);
     showLoginForm()
@@ -76,7 +78,7 @@ document.querySelector('#logoutButton').addEventListener('click', () => {
 document.querySelector('#showRegisterForm').addEventListener('click', redirectToRegister);
 
 // Edit form----------------------
-function setupEditForm() {
+function editUserForm() {
   const editUserButton = document.querySelector('#editUserButton');
   const saveUserButton = document.querySelector('#saveUserButton');
   const cancelUserEdit = document.querySelector('#cancelUserEdit');
@@ -120,7 +122,7 @@ function setupEditForm() {
       if (updatedUserData) {
         showUser(updatedUserData);
         exitEditMode();
-        alert('用戶資訊更新成功！');
+        alert('更新成功！');
       }
     } catch (error) {
       console.error('更新失敗:', error);
@@ -130,6 +132,102 @@ function setupEditForm() {
 }
 
 // ----------------
+async function editCityForm() {
+  const editCitiesButton = document.querySelector('#editCities');
+  const editCitiesModal = document.querySelector('#editCitiesModal');
+  const citiesSelect = document.querySelector('#citiesSelect');
+  const selectedCitiesList = document.querySelector('#selectedCitiesList');
+  const updateCitiesButton = document.querySelector('#updateCitiesButton');
+  const cancelCitiesButton = document.querySelector('#cancelCitiesButton');
+
+  let cities = [];
+  let selectedCities = [];
+
+  function updateSelectedCitiesList() {
+    selectedCitiesList.innerHTML = ''; // 清空列表
+    selectedCities.forEach(city => {
+      const span = document.createElement('span');
+      span.textContent = city.name;
+      span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '×';
+      removeButton.classList.add('ml-2', 'text-red-500', 'font-bold');
+      removeButton.onclick = function() {
+        selectedCities = selectedCities.filter(c => c.id !== city.id);
+        updateSelectedCitiesList();
+        citiesSelect.value = ''; // 重置 select
+      };
+
+      span.appendChild(removeButton);
+      selectedCitiesList.appendChild(span);
+    });
+  }
+
+  function fillCitiesSelect() {
+    citiesSelect.innerHTML = '<option value="">選擇城市</option>';
+    cities.forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.id.toString();
+      option.textContent = city.name;
+      citiesSelect.appendChild(option);
+    });
+  }
+
+  // 顯示模態框
+  editCitiesButton.addEventListener('click', async () => {
+    editCitiesModal.classList.remove('hidden');
+    try {
+      cities = await fetchCities();
+      fillCitiesSelect(); //下拉選單
+      // 從「可上課地區」的欄位中抓取目前有選的縣市
+      const currentUserCities = Array.from(document.querySelector('#userCities').children).map(span => span.textContent);
+      selectedCities = cities.filter(city => currentUserCities.includes(city.name));
+      updateSelectedCitiesList();
+    } catch (error) {
+      console.error('後台連線失敗:', error);
+      alert('無法獲取城市選單，請稍後再試。');
+    }
+  });
+
+  citiesSelect.addEventListener('change', function() {
+    const selectedCityId = this.value;
+    const selectedCity = cities.find(city => city.id.toString() === selectedCityId);
+    if (selectedCity && !selectedCities.some(city => city.id === selectedCity.id)) {
+      selectedCities.push(selectedCity);
+      updateSelectedCitiesList();
+    }
+    this.value = '';
+  });
+
+  editCitiesModal.addEventListener('click', (event) => {
+    if (event.target === editCitiesModal) {
+      editCitiesModal.classList.add('hidden');
+    }
+  });
+
+  cancelCitiesButton.addEventListener('click', () => {
+    editCitiesModal.classList.add('hidden');
+  });
+
+  updateCitiesButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    try {
+      const updatedUserData = await auth.updateUserCities(selectedCities.map(city => city.name));
+      const userCities = document.querySelector('#userCities');
+      if (updatedUserData) {
+        userCities.innerHTML = '';
+        showUserCities(updatedUserData.cities, userCities);
+        editCitiesModal.classList.add('hidden');
+        alert('城市更新成功！');
+      }
+    } catch (error) {
+      console.error('更新失敗:', error);
+      alert('更新失敗。');
+    }
+  });
+}
 
 feather.replace();
 

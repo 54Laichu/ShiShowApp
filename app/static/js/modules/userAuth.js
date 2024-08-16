@@ -93,46 +93,48 @@ class UserAuth {
 		localStorage.removeItem('token');
 	}
 
-	async updateUser({
-    name = undefined,
-    password = undefined,
-    cities = undefined,
-    course_categories = undefined,
-    coaches = undefined
-  	} = {}) {
+	async updateUser({ name, password } = {}) {
     const updateData = {};
-
     if (name !== undefined) updateData.name = name;
     if (password !== undefined) updateData.password = password;
-    if (Array.isArray(cities)) updateData.cities = cities;
-    if (Array.isArray(course_categories)) updateData.course_categories = course_categories;
-    if (Array.isArray(coaches)) updateData.coaches = coaches;
 
-    // 如果資料沒更新，就直接 return
+    return this._sendUpdateRequest(updateData);
+	}
+
+	async updateUserCities(cities) {
+    if (!Array.isArray(cities)) {
+      throw new Error('Cities must be an array');
+    }
+    return this._sendUpdateRequest({ cities });
+  }
+
+  async updateUserCourseCategories(courseCategories) {
+    if (!Array.isArray(courseCategories)) {
+      throw new Error('Course categories must be an array');
+    }
+    return this._sendUpdateRequest({ course_categories: courseCategories });
+	}
+
+	async _sendUpdateRequest(updateData) {
     if (Object.keys(updateData).length === 0) {
       return null;
-		}
-
-		console.log(updateData)
-		console.log(JSON.stringify(updateData))
+    }
 
     const response = await fetch(`${this.baseUrl}/user`, {
       method: 'PUT',
-			headers: {
-				"Authorization": `Bearer ${this.token}`,
+      headers: {
+        "Authorization": `Bearer ${this.token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(updateData),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || '更新失敗');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     return await response.json();
   }
-
 }
 
 export default UserAuth;
