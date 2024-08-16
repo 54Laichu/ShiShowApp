@@ -57,7 +57,6 @@ class UserAuth {
 				throw new Error('使用者憑證無效');
 			}
 			const data = await response.json();
-			console.log(data)
 			return data;
 		} catch (error) {
 			this.logout();  // 如果驗證失敗，清除 token

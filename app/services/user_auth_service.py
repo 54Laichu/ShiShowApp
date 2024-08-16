@@ -65,7 +65,7 @@ class UserAuthService:
                     name=user.name,
                     email=user.email,
                     cities=cities,
-                    course_catrgories=course_categories,
+                    course_categories=course_categories,
                     coaches = coaches
                 )
                 return user_read

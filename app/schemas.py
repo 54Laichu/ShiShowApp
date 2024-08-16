@@ -35,7 +35,7 @@ class UserRead(SQLModel):
     name: str
     email: str
     cities: Optional[List[str]] = None
-    course_catrgories: Optional[List[str]] = None
+    course_categories: Optional[List[str]] = None
     coaches: Optional[List[str]] = None
 
     class Config:

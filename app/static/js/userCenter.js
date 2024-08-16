@@ -10,10 +10,11 @@ async function initApp() {
     const userCourseCategories = document.querySelector('#userCourseCategories');
     showUser(userData);
     showUserCities(userData.cities, userCities)
-    showUserCourseCategories(userData.course_catrgories, userCourseCategories)
+    showUserCourseCategories(userData.course_categories, userCourseCategories)
     // console.log(userData);
     editUserForm();
     editCityForm();
+    editCourseCategoryForm();
 	} catch (error) {
     console.error(error);
     showLoginForm()
@@ -174,7 +175,7 @@ async function editCityForm() {
     });
   }
 
-  // 顯示模態框
+  // 下拉選單
   editCitiesButton.addEventListener('click', async () => {
     editCitiesModal.classList.remove('hidden');
     try {
@@ -228,6 +229,156 @@ async function editCityForm() {
     }
   });
 }
+
+
+// Edit CourseCategory--------------------------------
+async function editCourseCategoryForm() {
+  const editCourseCategoriesButton = document.querySelector('#editCourseCategories');
+  const editCourseCategoriesModal = document.querySelector('#editCourseCategoriesModal');
+  const courseCategoriesSelect = document.querySelector('#courseCategoriesSelect');
+  const selectedCourseCategoriesList = document.querySelector('#selectedCourseCategoriesList');
+  const updateCourseCategoriesButton = document.querySelector('#updateCourseCategoriesButton');
+  const cancelCourseCategoriesButton = document.querySelector('#cancelCourseCategoriesButton');
+  const userCourseCategoriesDisplay = document.querySelector('#userCourseCategories');
+
+  let courseCategories = [];
+  let selectedCourseCategories = [];
+
+  function updateSelectedCourseCategoriesList() {
+    selectedCourseCategoriesList.innerHTML = '';
+    selectedCourseCategories.forEach(category => {
+      const span = document.createElement('span');
+      span.textContent = category.name;
+      span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '×';
+      removeButton.classList.add('ml-2', 'text-red-500', 'font-bold');
+      removeButton.onclick = function() {
+        selectedCourseCategories = selectedCourseCategories.filter(c => c.id !== category.id);
+        updateSelectedCourseCategoriesList();
+        courseCategoriesSelect.value = '';
+      };
+
+      span.appendChild(removeButton);
+      selectedCourseCategoriesList.appendChild(span);
+    });
+  }
+
+  function fillCourseCategoriesSelect() {
+    if (!courseCategoriesSelect) {
+      console.error('courseCategoriesSelect 元素不存在');
+      return;
+    }
+    courseCategoriesSelect.innerHTML = '<option value="">選擇課程種類</option>';
+    courseCategories.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category.id.toString();
+      option.textContent = category.name;
+      courseCategoriesSelect.appendChild(option);
+    });
+  }
+
+  function updateUserCourseCategoriesDisplay(categoryNames) {
+    userCourseCategoriesDisplay.innerHTML = '';
+    categoryNames.forEach(categoryName => {
+      const span = document.createElement('span');
+      span.textContent = categoryName;
+      span.classList.add('bg-green-200', 'text-green-800', 'px-2', 'py-1', 'rounded', 'mr-2', 'mb-2', 'inline-block');
+      userCourseCategoriesDisplay.appendChild(span);
+    });
+  }
+
+  editCourseCategoriesButton.addEventListener('click', async () => {
+    editCourseCategoriesModal.classList.remove('hidden');
+    try {
+      courseCategories = await fetchCourseCategories();
+      if (!Array.isArray(courseCategories) || courseCategories.length === 0) {
+        throw new Error('課程類別清單為空或格式不正確');
+      }
+      fillCourseCategoriesSelect();
+      // 從「喜歡的課程種類」的欄位中抓取目前有選的課程種類
+      const currentUserCategories = Array.from(userCourseCategoriesDisplay.children).map(span => span.textContent);
+      selectedCourseCategories = courseCategories.filter(category => currentUserCategories.includes(category.name));
+      updateSelectedCourseCategoriesList();
+    } catch (error) {
+      console.error('讀取失敗:', error);
+      alert('無法讀取課程種類，請稍後再試。' + error.message);
+      editCourseCategoriesModal.classList.add('hidden');
+    }
+  });
+
+  // 選課程種類
+  courseCategoriesSelect.addEventListener('change', function() {
+    const selectedCategoryId = this.value;
+    const selectedCategory = courseCategories.find(category => category.id.toString() === selectedCategoryId);
+    if (selectedCategory && !selectedCourseCategories.some(category => category.id === selectedCategory.id)) {
+      selectedCourseCategories.push(selectedCategory);
+      updateSelectedCourseCategoriesList();
+    }
+    this.value = '';
+  });
+
+  editCourseCategoriesModal.addEventListener('click', (event) => {
+    if (event.target === editCourseCategoriesModal) {
+      editCourseCategoriesModal.classList.add('hidden');
+    }
+  });
+
+  cancelCourseCategoriesButton.addEventListener('click', () => {
+    editCourseCategoriesModal.classList.add('hidden');
+  });
+
+  updateCourseCategoriesButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    try {
+      const updatedUserData = await auth.updateUserCourseCategories(selectedCourseCategories.map(category => category.name));
+
+      if (updatedUserData && typeof updatedUserData === 'object') {
+        let courseCategoriesData;
+
+        if (Array.isArray(updatedUserData.courseCategories)) {
+          courseCategoriesData = updatedUserData.courseCategories;
+        } else if (Array.isArray(updatedUserData.course_categories)) {
+          courseCategoriesData = updatedUserData.course_categories;
+        } else if (Array.isArray(updatedUserData)) {
+          courseCategoriesData = updatedUserData;
+        } else {
+          throw new Error('無法在返回數據中找到課程類別數組');
+        }
+
+        if (courseCategoriesData.length > 0 && typeof courseCategoriesData[0] === 'string') {
+          updateUserCourseCategoriesDisplay(courseCategoriesData);
+          editCourseCategoriesModal.classList.add('hidden');
+          alert('課程種類更新成功！');
+        } else if (courseCategoriesData.length > 0 && typeof courseCategoriesData[0] === 'object' && courseCategoriesData[0].name) {
+          updateUserCourseCategoriesDisplay(courseCategoriesData.map(category => category.name));
+          editCourseCategoriesModal.classList.add('hidden');
+          alert('課程種類更新成功！');
+        } else {
+          throw new Error('課程類別數據格式不正確');
+        }
+      } else {
+        throw new Error('更新後的用戶數據格式不正確');
+      }
+    } catch (error) {
+      console.error('更新失敗:', error);
+      alert('更新失敗。請再試一次。錯誤詳情：' + error.message);
+    }
+  });
+
+  function updateUserCourseCategoriesDisplay(categoryNames) {
+    userCourseCategoriesDisplay.innerHTML = '';
+    categoryNames.forEach(categoryName => {
+      const span = document.createElement('span');
+      span.textContent = categoryName;
+      span.classList.add('bg-green-200', 'text-green-800', 'px-2', 'py-1', 'rounded', 'mr-2', 'mb-2', 'inline-block');
+      userCourseCategoriesDisplay.appendChild(span);
+    });
+  }
+}
+// --------------------------------
 
 feather.replace();
 

@@ -56,8 +56,8 @@
     <!-- user coursecategories -->
     <section class="bg-white rounded-lg shadow-md p-6 mb-8">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">感興趣的課程</h2>
-        <button id="editCategories" class="text-gray-500 hover:text-orange-700">
+        <h2 class="text-xl font-semibold">喜歡的課程種類</h2>
+        <button id="editCourseCategories" class="text-gray-500 hover:text-orange-700">
           <i data-feather="edit-2"></i>
         </button>
       </div>
@@ -99,6 +99,7 @@
     </div>
   </main>
   {% include 'edit_city.html' %}
+  {% include 'edit_course_category.html' %}
   {% include 'navbar.html' %}
   <script type="module" src="{{ url_for('static', path='/js/userCenter.js') }}"></script>
 {% endblock %}
