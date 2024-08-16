@@ -53,10 +53,6 @@ function showLoginForm() {
 }
 
 // --- Login form
-function redirectToRegister() {
-  window.location.href = '/register';
-}
-
 document.querySelector('#loginForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const email = document.querySelector('#email').value;
@@ -76,7 +72,9 @@ document.querySelector('#logoutButton').addEventListener('click', () => {
 	showUnauthenticatedUI();
 });
 
-document.querySelector('#showRegisterForm').addEventListener('click', redirectToRegister);
+document.querySelector('#showRegisterForm').addEventListener('click', () => {
+  window.location.href = '/register'
+});
 
 // Edit form----------------------
 function editUserForm() {
@@ -166,23 +164,22 @@ async function editCityForm() {
     });
   }
 
-  function fillCitiesSelect() {
-    citiesSelect.innerHTML = '<option value="">選擇城市</option>';
-    cities.forEach(city => {
-      const option = document.createElement('option');
-      option.value = city.id.toString();
-      option.textContent = city.name;
-      citiesSelect.appendChild(option);
-    });
-  }
-
   // 下拉選單
   editCitiesButton.addEventListener('click', async () => {
     editCitiesModal.classList.remove('hidden');
     try {
       cities = await fetchCities();
-      fillCitiesSelect(); //下拉選單
-      // 從「可上課地區」的欄位中抓取目前有選的縣市
+
+      // 產生選單
+      citiesSelect.innerHTML = '<option value="">選擇城市</option>';
+      cities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.id.toString();
+        option.textContent = city.name;
+        citiesSelect.appendChild(option);
+      });
+
+      // 預選目前有勾選的縣市
       const currentUserCities = Array.from(document.querySelector('#userCities').children).map(span => span.textContent);
       selectedCities = cities.filter(city => currentUserCities.includes(city.name));
       updateSelectedCitiesList();
@@ -192,6 +189,7 @@ async function editCityForm() {
     }
   });
 
+  // 當所選的城市 id 對應 cities 陣列，如果有在清單中，且沒有出現在已選清單，就選起來
   citiesSelect.addEventListener('change', function() {
     const selectedCityId = this.value;
     const selectedCity = cities.find(city => city.id.toString() === selectedCityId);
@@ -214,9 +212,10 @@ async function editCityForm() {
 
   updateCitiesButton.addEventListener('click', async (event) => {
     event.preventDefault();
+    const url = "/user_city";
 
     try {
-      const updatedUserData = await auth.updateUserCities(selectedCities.map(city => city.name));
+      const updatedUserData = await auth.updateUserCities(selectedCities.map(city => city.name), url); // 先將 city.name 輸出成 array，在發送 PUT 到後端
       const userCities = document.querySelector('#userCities');
       if (updatedUserData) {
         userCities.innerHTML = '';

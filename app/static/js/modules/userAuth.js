@@ -85,18 +85,18 @@ class UserAuth {
     return this._sendUpdateRequest(updateData, url);
 	}
 
-	async updateUserCities(cities) {
+	async updateUserCities(cities, url) {
     if (!Array.isArray(cities)) {
-      throw new Error('Cities must be an array');
+      throw new Error('格式錯誤(要是 Array)');
     }
-    return this._sendUpdateRequest({ cities });
+    return this._sendUpdateRequest({ cities }, url);
   }
 
-  async updateUserCourseCategories(courseCategories) {
+  async updateUserCourseCategories(courseCategories, url) {
     if (!Array.isArray(courseCategories)) {
       throw new Error('Course categories must be an array');
     }
-    return this._sendUpdateRequest({ course_categories: courseCategories });
+    return this._sendUpdateRequest({ course_categories: courseCategories }, url);
 	}
 
 	async _sendUpdateRequest(updateData, url) {
