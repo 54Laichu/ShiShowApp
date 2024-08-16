@@ -55,72 +55,98 @@ class UserService:
         result = await self.db.execute(select(User).filter((User.email == email) | (User.phone == phone)))
         return result.scalar_one_or_none()
 
-    async def update_user(self, user_id: int, user_data: UserUpdate) -> UserRead:
-            print(f"Updating user {user_id} with data: {user_data}")
-            try:
-                # Load user with related entities
-                query = (
-                    select(User)
-                    .options(
-                        selectinload(User.cities),
-                        selectinload(User.course_categories),
-                        selectinload(User.coaches)
-                    )
-                    .where(User.id == user_id)
+    async def update_user(self, user_id: int, user_data: UserUpdate):
+        try:
+            query = (select(User).filter(User.id == user_id))
+            result = await self.db.execute(query)
+            user = result.scalar_one_or_none()
+
+            if not user:
+                raise ValueError("User not found")
+
+            if user_data.name is not None:
+                user.name = user_data.name
+            if user_data.password is not None and user_data.password != '':
+                user.hashed_password = get_password_hash(user_data.password)
+
+            await self.db.commit()
+
+            return {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email
+            }
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error in update_user: {str(e)}")
+            raise
+
+
+    async def update_user_all(self, user_id: int, user_data: UserUpdate) -> UserRead:
+        try:
+            # Load user with related entities
+            query = (
+                select(User)
+                .options(
+                    selectinload(User.cities),
+                    selectinload(User.course_categories),
+                    selectinload(User.coaches)
                 )
-                result = await self.db.execute(query)
-                user = result.scalar_one_or_none()
+                .where(User.id == user_id)
+            )
+            result = await self.db.execute(query)
+            user = result.scalar_one_or_none()
 
-                if not user:
-                    raise ValueError("User not found")
+            if not user:
+                raise ValueError("User not found")
 
-                # Update user data
-                if user_data.name is not None:
-                    user.name = user_data.name
-                if user_data.password is not None and user_data.password != '':
-                    user.hashed_password = get_password_hash(user_data.password)
+            # Update user data
+            if user_data.name is not None:
+                user.name = user_data.name
+            if user_data.password is not None and user_data.password != '':
+                user.hashed_password = get_password_hash(user_data.password)
 
-                if user_data.cities is not None:
-                    user.cities = []
-                    for city_name in user_data.cities:
-                        city_query = select(City).where(City.name == city_name)
-                        city = (await self.db.execute(city_query)).scalar_one_or_none()
-                        if city:
-                            user.cities.append(city)
-                        else:
-                            raise ValueError(f"Invalid city: {city_name}")
+            if user_data.cities is not None:
+                user.cities = []
+                for city_name in user_data.cities:
+                    city_query = select(City).where(City.name == city_name)
+                    city = (await self.db.execute(city_query)).scalar_one_or_none()
+                    if city:
+                        user.cities.append(city)
+                    else:
+                        raise ValueError(f"Invalid city: {city_name}")
 
-                if user_data.course_categories is not None:
-                    user.course_categories = []
-                    for category_name in user_data.course_categories:
-                        category_query = select(CourseCategory).where(CourseCategory.name == category_name)
-                        category = (await self.db.execute(category_query)).scalar_one_or_none()
-                        if category:
-                            user.course_categories.append(category)
-                        else:
-                            raise ValueError(f"Invalid course category: {category_name}")
+            if user_data.course_categories is not None:
+                user.course_categories = []
+                for category_name in user_data.course_categories:
+                    category_query = select(CourseCategory).where(CourseCategory.name == category_name)
+                    category = (await self.db.execute(category_query)).scalar_one_or_none()
+                    if category:
+                        user.course_categories.append(category)
+                    else:
+                        raise ValueError(f"Invalid course category: {category_name}")
 
-                if user_data.coaches is not None:
-                    user.coaches = []
-                    for coach_name in user_data.coaches:
-                        coach_query = select(Coach).where(Coach.name == coach_name)
-                        coach = (await self.db.execute(coach_query)).scalar_one_or_none()
-                        if coach:
-                            user.coaches.append(coach)
-                        else:
-                            raise ValueError(f"Invalid coach: {coach_name}")
+            if user_data.coaches is not None:
+                user.coaches = []
+                for coach_name in user_data.coaches:
+                    coach_query = select(Coach).where(Coach.name == coach_name)
+                    coach = (await self.db.execute(coach_query)).scalar_one_or_none()
+                    if coach:
+                        user.coaches.append(coach)
+                    else:
+                        raise ValueError(f"Invalid coach: {coach_name}")
 
-                await self.db.commit()
+            await self.db.commit()
 
-                return UserRead(
-                    id=user.id,
-                    name=user.name,
-                    email=user.email,
-                    cities=[city.name for city in user.cities],
-                    course_categories=[category.name for category in user.course_categories],
-                    coaches=[coach.name for coach in user.coaches]
-                )
-            except Exception as e:
-                await self.db.rollback()
-                print(f"Error in update_user: {str(e)}")
-                raise
+            return UserRead(
+                id=user.id,
+                name=user.name,
+                email=user.email,
+                cities=[city.name for city in user.cities],
+                course_categories=[category.name for category in user.course_categories],
+                coaches=[coach.name for coach in user.coaches]
+            )
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error in update_user: {str(e)}")
+            raise

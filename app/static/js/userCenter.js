@@ -117,9 +117,10 @@ function editUserForm() {
     event.preventDefault();
     const name = editName.value;
     const password = editPassword.value;
+    const url = "/user"
 
     try {
-      const updatedUserData = await auth.updateUser({ name, password });
+      const updatedUserData = await auth.updateUser({ name, password }, url);
       if (updatedUserData) {
         showUser(updatedUserData);
         exitEditMode();

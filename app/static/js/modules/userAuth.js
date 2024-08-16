@@ -3,26 +3,7 @@ class UserAuth {
 		this.baseUrl = baseUrl;
 		this.token = localStorage.getItem('token');
   }
-  // ------------------------------------------------------------
 
-	async checkJWT(url) {
-		if (!this.token) {
-			throw new Error('No token found');
-    }
-
-    const response = await fetch(`${this.baseUrl}${url}`, {
-      method: 'GET',
-      headers: { "Authorization": `Bearer ${this.token}`,},
-    });
-
-		if (response.status === 401) {
-			this.logout();
-			throw new Error('憑證無效');
-		}
-		return response;
-  }
-
-  // ------------------------------------------------------------
 	async checkAuth() {
 		if (!this.token) {
 			console.log('尚未登入');
@@ -30,7 +11,11 @@ class UserAuth {
 		}
 
 		try {
-			const response = await this.checkJWT('/user/auth');
+			const response = await this.fetch(`${this.baseUrl}/user/auth`, {
+				method: 'GET',
+				headers: { "Authorization": `Bearer ${this.token}`,},
+			});
+
 			if (!response.ok) {
 				throw new Error('使用者憑證無效');
       }
@@ -92,12 +77,12 @@ class UserAuth {
 		localStorage.removeItem('token');
 	}
 
-	async updateUser({ name, password } = {}) {
+	async updateUser({ name, password } = {}, url) {
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (password !== undefined) updateData.password = password;
 
-    return this._sendUpdateRequest(updateData);
+    return this._sendUpdateRequest(updateData, url);
 	}
 
 	async updateUserCities(cities) {
@@ -114,12 +99,12 @@ class UserAuth {
     return this._sendUpdateRequest({ course_categories: courseCategories });
 	}
 
-	async _sendUpdateRequest(updateData) {
+	async _sendUpdateRequest(updateData, url) {
     if (Object.keys(updateData).length === 0) {
       return null;
     }
 
-    const response = await fetch(`${this.baseUrl}/user`, {
+    const response = await fetch(`${this.baseUrl}${url}`, {
       method: 'PUT',
       headers: {
         "Authorization": `Bearer ${this.token}`,

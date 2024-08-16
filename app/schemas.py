@@ -18,9 +18,12 @@ class UserCreate(UserBase):
 class UserUpdate(SQLModel):
     name: Optional[str] = None
     password: Optional[str] = None
-    cities: Optional[List[str]] = None
-    course_categories: Optional[List[str]] = None
-    coaches: Optional[List[str]] = None
+
+class UserCitiesUpdate(SQLModel):
+    cities: List[str]
+
+class UserCourseCategoriessUpdate(SQLModel):
+    course_categories: List[str]
 
 class UserPassport(SQLModel):
     id: int

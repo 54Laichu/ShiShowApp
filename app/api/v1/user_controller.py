@@ -18,13 +18,27 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_session))
         raise HTTPException(status_code=400, detail="信箱或電話已註冊")
     return await UserService(db).create_user(user)
 
-@router.put("/user", response_model=UserRead)
+@router.put("/user", response_model=UserPassport)
 async def update_user(update_data: UserUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:
         auth_user = await UserAuthService(db).verify_current_user(auth_header)
         if auth_user:
             user_id = auth_user.id
             updated_user = await UserService(db).update_user(user_id, update_data)
+            return updated_user
+        else:
+            return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
+    except Exception as e:
+        print(f"Error updating user: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+@router.put("/user_all", response_model=UserRead )
+async def update_user(update_data: UserUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        auth_user = await UserAuthService(db).verify_current_user(auth_header)
+        if auth_user:
+            user_id = auth_user.id
+            updated_user = await UserService(db).update_user_all(user_id, update_data)
             return updated_user
         else:
             return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
