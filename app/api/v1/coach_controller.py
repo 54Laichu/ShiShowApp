@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import JSONResponse
-from app.schemas import CoachCreate, CoachLogin, CoachPassport
+from app.schemas import CoachCreate, CoachLogin, CoachPassport, CoachRead
 from app.services.coach_service import CoachService, CoachAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +28,14 @@ async def login(form_info: CoachLogin, db: AsyncSession = Depends(get_session)):
 async def get_coach_auth(auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:
         coach = await CoachAuthService(db).verify_current_coach(auth_header)
+        return coach
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+@router.get("/coach_center", response_model=CoachRead)
+async def get_coach_center_data(auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        coach = await CoachAuthService(db).load_current_coach_data(auth_header)
         return coach
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})

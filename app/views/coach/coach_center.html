@@ -1,0 +1,120 @@
+{% extends "coach/base.html" %}
+{% block content %}
+  <main class="container mx-auto px-4 py-8 mb-20">
+    {% include "coach/login.html" %}
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-xl font-semibold mb-4">個人資訊</h2>
+      <form id="updateCoachForm">
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>大頭照：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <img id="profilePreview" src="/static/favicon.ico" alt="Profile Photo" class="w-20 h-20 rounded-full object-cover mr-4">
+            <input type="file" id="profilePhotoInput" name="profile_photo" accept="image/*" class="hidden">
+            <label for="profilePhotoInput" class="cursor-pointer bg-gray-200 rounded hover:bg-gray-500 transition duration-300">
+              選擇照片
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>姓名：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <span id="coachName" class="mr-4"></span>
+            <input type="text" id="editName" name="name" class="hidden w-full rounded-md bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+          </div>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>Email：</strong>
+          </div>
+          <div class="w-2/4">
+            <span id="coachEmail"></span>
+          </div>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>密碼：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <span id="passwordPlaceholder" class="mr-4">••••••••</span>
+            <input type="password" id="editPassword" name="password" class="hidden w-full rounded-md border-black bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="editCoachButton" class="bg-orange-200 text-gray px-4 py-2 rounded hover:bg-orange-600 transition duration-300">
+            編輯資料
+          </button>
+          <button type="submit" id="saveCoachButton" class="hidden bg-green-100 text-green-800 px-4 py-2 rounded hover:bg-green-300 transition duration-300">確定更改</button>
+          <button type="button" id="cancelCoachEdit" class="hidden bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition duration-300">取消</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">證照</h2>
+        <button id="editCertificates" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="coachCertificates" class="flex flex-wrap gap-4 mb-4">
+        <!-- 現有的證照圖片將在這裡動態添加 -->
+      </div>
+      <div id="certificateUpload" class="hidden">
+        <input type="file" id="certificatePhotoInput" name="certificate_photos" accept="image/*" multiple class="hidden">
+        <label for="certificatePhotoInput" class="cursor-pointer bg-gray-200 rounded hover:bg-gray-500 transition duration-300 px-4 py-2">
+          選擇照片（可多選）
+        </label>
+      </div>
+    </section>
+
+
+    <!-- coach cities -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">可上課健身房</h2>
+        <button id="editGyms" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="coachGyms" class="flex flex-wrap gap-2">
+      </div>
+    </section>
+
+    <!-- coach cities -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">可上課地區</h2>
+        <button id="editCities" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="coachCities" class="flex flex-wrap gap-2">
+      </div>
+    </section>
+
+    <!-- coach coursecategories -->
+    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">可接的課程種類</h2>
+        <button id="editCourseCategories" class="text-gray-500 hover:text-orange-700">
+          <i data-feather="edit-2"></i>
+        </button>
+      </div>
+      <div id="coachCourseCategories" class="flex flex-wrap gap-2">
+      </div>
+    </section>
+
+    <div id="logoutButton" class="bg-red-500 rounded-lg p-6 text-center cursor-pointer hover:bg-red-600">
+      <button class="text-white rounded">登出</button>
+    </div>
+  </main>
+  {% include 'coach/navbar.html' %}
+  <script type="module" src="{{ url_for('static', path='/js/coach/coachCenter.js') }}"></script>
+  <script src="{{ url_for('static', path='/js/coach/modules/profilePhotoUpload.js') }}"></script>
+{% endblock %}

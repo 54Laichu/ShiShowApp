@@ -34,6 +34,9 @@ async def index(request: Request):
 @app.get("/coach/register", include_in_schema=False)
 async def create_coach(request: Request):
   return templates.TemplateResponse("coach/register.html", {"request": request})
+@app.get("/coach/coach_center", include_in_schema=False)
+async def show(request: Request):
+    return templates.TemplateResponse("coach/coach_center.html", {"request": request})
 
 
 app.include_router(coach_controller.router, prefix="/api/v1", tags=["Coach"])

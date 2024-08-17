@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShiShow 預約課程</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="min-h-screen flex flex-col">
+    <!-- 頭部 -->
+    <header class="bg-white shadow-md p-4">
+      <h1 class="text-2xl font-bold text-center">預約課程</h1>
+    </header>
+
+    <!-- 主體內容 -->
+    <main class="flex-1 container mx-auto px-4 py-8">
+      <h2 class="text-xl font-semibold mb-4">已綁定的教練</h2>
+
+      <!-- 教練列表 -->
+      <div class="space-y-4">
+        <!-- 教練卡片 1 -->
+        <div class="bg-white rounded-lg shadow-md p-4" onclick="showBookingModal('陳教練', '瑜伽')">
+          <div class="flex items-center">
+            <img src="https://fakeimg.pl/100x100/ffd700,128/?text=陳" alt="陳教練" class="w-16 h-16 rounded-full mr-4">
+            <div>
+              <h3 class="text-lg font-semibold">Alice Chen</h3>
+              <p class="text-gray-600">專長：瑜伽</p>
+            </div>
+          </div>
+          <p class="mt-2 text-gray-700">5年教學經驗，專注於提升身心靈健康。</p>
+        </div>
+
+        <!-- 教練卡片 2 -->
+        <div class="bg-white rounded-lg shadow-md p-4" onclick="showBookingModal('李教練', '重訓')">
+          <div class="flex items-center">
+            <img src="https://fakeimg.pl/100x100/00bfff,128/?text=李" alt="李教練" class="w-16 h-16 rounded-full mr-4">
+            <div>
+              <h3 class="text-lg font-semibold">Bruce Lee</h3>
+              <p class="text-gray-600">專長：綜合截拳道</p>
+            </div>
+          </div>
+          <p class="mt-2 text-gray-700">8年教練經驗，擅長制定個人化戰鬥計劃。</p>
+        </div>
+
+        <!-- 教練卡片 3 -->
+        <div class="bg-white rounded-lg shadow-md p-4" onclick="showBookingModal('王教練', '有氧運動')">
+          <div class="flex items-center">
+            <img src="https://fakeimg.pl/100x100/98fb98,128/?text=王" alt="王教練" class="w-16 h-16 rounded-full mr-4">
+            <div>
+              <h3 class="text-lg font-semibold">Ma BaoGuo</h3>
+              <p class="text-gray-600">專長：氣功運動</p>
+            </div>
+          </div>
+          <p class="mt-2 text-gray-700">閃電五連鞭＋與時尚網紅的精彩邂逅。</p>
+        </div>
+      </div>
+    </main>
+
+    {% include 'navbar.html' %}
+  </div>
+
+  <!-- 預約模態框 -->
+  <div id="bookingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3 text-center">
+        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">預約課程</h3>
+        <div class="mt-2 px-7 py-3">
+          <p class="text-sm text-gray-500" id="modalContent">
+            請選擇您想預約的時間：
+          </p>
+          <div class="mt-4">
+            <input type="date" id="bookingDate" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div class="mt-4">
+            <select id="bookingTime" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+              <option value="">請選擇時間</option>
+              <option value="09:00">09:00</option>
+              <option value="10:00">10:00</option>
+              <option value="11:00">11:00</option>
+              <option value="14:00">14:00</option>
+              <option value="15:00">15:00</option>
+              <option value="16:00">16:00</option>
+            </select>
+          </div>
+        </div>
+        <div class="items-center px-4 py-3">
+          <button id="confirmBooking" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            確認預約
+          </button>
+        </div>
+        <div class="items-center px-4 py-3">
+          <button id="closeModal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+            關閉
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化 Feather Icons
+    feather.replace();
+
+    // 預約模態框相關函數
+    const modal = document.getElementById('bookingModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const confirmBookingBtn = document.getElementById('confirmBooking');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    function showBookingModal(trainerName, specialty) {
+      modalTitle.textContent = `預約 ${trainerName} 的${specialty}課程`;
+      modalContent.textContent = `請選擇您想預約 ${trainerName} ${specialty}課程的時間：`;
+      modal.classList.remove('hidden');
+    }
+
+    closeModalBtn.onclick = function() {
+      modal.classList.add('hidden');
+    }
+
+    confirmBookingBtn.onclick = function() {
+      const date = document.getElementById('bookingDate').value;
+      const time = document.getElementById('bookingTime').value;
+      if (date && time) {
+        alert(`預約成功！您已預約 ${modalTitle.textContent.split(' ')[1]} 的課程，時間為 ${date} ${time}`);
+        modal.classList.add('hidden');
+      } else {
+        alert('請選擇日期和時間！');
+      }
+    }
+
+    // 點擊模態框外部關閉模態框
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

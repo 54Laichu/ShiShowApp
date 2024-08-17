@@ -4,11 +4,12 @@ from sqlmodel import select
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
 from app.settings.config import settings
-from app.models import Coach, CoachCity, City, CoachCourseCategory, CourseCategory, UserCoach
+from app.models import Coach, CoachCity, City, CoachCourseCategory, CourseCategory, Certificate
 from app.schemas import CoachPassport, CoachRead
 import jwt
 import bcrypt
 import logging
+from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger()
 
@@ -73,3 +74,50 @@ class CoachAuthService:
             logger.error(f"Unexpected error during coach verification: {e}")
             raise HTTPException(status_code=500, detail="Internal Server Error")
 
+    async def load_current_coach_data(self, auth_header: str) -> CoachRead:
+        try:
+            scheme, token = auth_header.split(" ")
+            if scheme.lower() != 'bearer':
+                raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+
+            try:
+                payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+            except jwt.PyJWTError as e:
+                raise HTTPException(status_code=401, detail=f"str{e}")
+
+            coach_id = payload.get("coach_id")
+
+            if coach_id is None:
+                raise HTTPException(status_code=401, detail="無效 token")
+
+            coach_query = (
+                select(Coach)
+                .options(
+                    selectinload(Coach.cities),
+                    selectinload(Coach.course_categories),
+                    selectinload(Coach.gyms),
+                    selectinload(Coach.certificates)
+                )
+                .where(Coach.id == coach_id)
+            )
+            result = await self.db.execute(coach_query)
+            coach = result.scalar_one_or_none()
+
+            if coach is None:
+                raise HTTPException(status_code=401, detail="查無資料")
+
+            coach_read = CoachRead(
+                id=coach.id,
+                name=coach.name,
+                email=coach.email,
+                account=coach.account,
+                certificates=[certificate.name for certificate in coach.certificates],
+                cities=[city.name for city in coach.cities],
+                gyms=[{"name": gym.name, "address": gym.address} for gym in coach.gyms],
+                course_categories=[category.name for category in coach.course_categories]
+            )
+            return coach_read
+
+        except Exception as e:
+            logger.error(f"Unexpected error during coach verification: {e}")
+            raise HTTPException(status_code=401, detail=f"str{e}")

@@ -24,6 +24,7 @@ class City(SQLModel, table=True):
     name: str = Field(unique=True, index=True)
     users: List["User"] = Relationship(back_populates="cities", link_model=UserCity)
     coaches: List["Coach"] = Relationship(back_populates="cities", link_model=CoachCity)
+    gyms: List["Gym"] = Relationship(back_populates="city")
 
 class UserCourseCategory(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
@@ -56,19 +57,17 @@ class Certificate(SQLModel, table=True):
     certificate_url: str
     coach: "Coach" = Relationship(back_populates="certificates")
 
+class CoachGym(SQLModel, table=True):
+    coach_id: int = Field(foreign_key="coach.id", primary_key=True)
+    gym_id: int = Field(foreign_key="gym.id", primary_key=True)
+
 class Gym(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     address: str = Field(unique=True)
     city_id: int = Field(foreign_key="city.id")
-    city: City = Relationship()
-    coach_gyms: List["CoachGym"] = Relationship(back_populates="gym")
-
-class CoachGym(SQLModel, table=True):
-    coach_id: int = Field(foreign_key="coach.id", primary_key=True)
-    gym_id: int = Field(foreign_key="gym.id", primary_key=True)
-    coach: "Coach" = Relationship(back_populates="coach_gyms")
-    gym: Gym = Relationship(back_populates="coach_gyms")
+    city: City = Relationship(back_populates="gyms")
+    coaches: List["Coach"] = Relationship(back_populates="gyms", link_model=CoachGym)
 
 class User(UserBase, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -89,6 +88,8 @@ class Coach(CoachBase, table=True):
     course_categories: List["CourseCategory"] = Relationship(back_populates="coaches", link_model=CoachCourseCategory)
     certificates: List["Certificate"] = Relationship(back_populates="coach")
     photos: List["CoachPhoto"] = Relationship(back_populates="coach")
-    coach_gyms: List["CoachGym"] = Relationship(back_populates="coach")
+    gyms: List["Gym"] = Relationship(back_populates="coaches", link_model=CoachGym)
+    certificates: List["Certificate"] = Relationship(back_populates="coach", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    photos: List["CoachPhoto"] = Relationship(back_populates="coach", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

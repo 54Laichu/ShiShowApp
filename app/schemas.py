@@ -63,9 +63,10 @@ class CoachRead(SQLModel):
     name: str
     account: str
     email: str
+    certificates: Optional[List[str]] = None
     cities: Optional[List[str]] = None
     course_categories: Optional[List[str]] = None
-    coaches: Optional[List[str]] = None
+    gyms: Optional[List[dict]] = None
 
     class Config:
         orm_mode = True
