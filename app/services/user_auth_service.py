@@ -78,12 +78,12 @@ class UserAuthService:
         try:
             scheme, token = auth_header.split(" ")
             if scheme.lower() != 'bearer':
-                raise HTTPException(status_code=401, detail="Invalid authentication scheme")
+                raise HTTPException(status_code=401, detail="驗證方式有誤")
 
             try:
                 payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
             except jwt.PyJWTError as e:
-                raise HTTPException(status_code=401, detail="無效的 token")
+                raise HTTPException(status_code=401, detail=f"{str(e)}")
 
             user_id = payload.get("user_id")
 
@@ -95,7 +95,7 @@ class UserAuthService:
             user = result.scalar_one_or_none()
 
             if user is None:
-                raise HTTPException(status_code=401, detail="User not found")
+                raise HTTPException(status_code=401, detail="查無使用者")
 
             user_passport = UserPassport(
                 id=user.id,
@@ -105,7 +105,7 @@ class UserAuthService:
             return user_passport
 
         except Exception as e:
-            raise HTTPException(status_code=401, detail="Authentication failed")
+            raise HTTPException(status_code=401, detail="身份驗證失敗")
 
     async def login(self, email: str, password: str) -> JSONResponse:
         user = await self.db.execute(select(User).filter(User.email == email))

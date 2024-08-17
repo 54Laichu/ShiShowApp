@@ -1,20 +1,20 @@
-import './modules/coachAuth.js';
+import CoachAuth from "./modules/coachAuth.js";
 
-const auth = new UserAuth('/api/v1');
+const auth = new CoachAuth('/api/v1');
 
 async function initApp() {
 	try {
-		const userData = await auth.checkAuth();
-		showAuthenticatedUI(userData);
+		const coachData = await auth.checkAuth();
+		showAuthenticatedUI(coachData);
 	} catch (error) {
 		console.error(error);
 		showUnauthenticatedUI();
 	}
 }
 
-function showAuthenticatedUI(userData) {
-	document.querySelector('#userInfo').textContent = `歡迎，${userData.name}`;
-	document.querySelector('#userEmail').textContent = userData.email;
+function showAuthenticatedUI(coachData) {
+	document.querySelector('#userInfo').textContent = `歡迎，${coachData.name}`;
+	document.querySelector('#userEmail').textContent = coachData.email;
 	document.querySelector('#authenticatedContent').style.display = 'block';
 	document.querySelector('#unauthenticatedContent').style.display = 'none';
 	document.querySelector('#loginFormModal').style.display = 'none';
@@ -35,7 +35,7 @@ function hideLoginForm() {
 }
 
 function redirectToRegister() {
-  window.location.href = '/register';
+  window.location.href = '/coach/register';
 }
 
 document.querySelector('#unauthenticatedContent').addEventListener('click', showLoginForm);

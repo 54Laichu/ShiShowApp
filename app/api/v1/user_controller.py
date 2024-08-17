@@ -6,12 +6,12 @@ from app.services.user_auth_service import UserAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from typing import Any, Annotated
+from typing import Annotated
 
 router = APIRouter()
 
 @router.post("/user")
-async def create_user(user: UserCreate, db: AsyncSession = Depends(get_session)) -> Any:
+async def create_user(user: UserCreate, db: AsyncSession = Depends(get_session)) -> JSONResponse:
     existing_phone_email = await UserService(db).get_user_by_phone_email(user.email, user.phone)
     if existing_phone_email:
         print("信箱或電話已註冊")
@@ -33,7 +33,7 @@ async def update_user(update_data: UserUpdate, auth_header: Annotated[str, Heade
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
 @router.put("/user_city", response_model=UserCitiesUpdate)
-async def update_user(update_data: UserCitiesUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+async def update_user_city(update_data: UserCitiesUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:
         auth_user = await UserAuthService(db).verify_current_user(auth_header)
         if auth_user:
@@ -47,7 +47,7 @@ async def update_user(update_data: UserCitiesUpdate, auth_header: Annotated[str,
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
 @router.put("/user_course_category", response_model=UserCourseCategoriessUpdate)
-async def update_user(update_data: UserCourseCategoriessUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+async def update_user_course_category(update_data: UserCourseCategoriessUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:
         auth_user = await UserAuthService(db).verify_current_user(auth_header)
         if auth_user:
@@ -61,7 +61,7 @@ async def update_user(update_data: UserCourseCategoriessUpdate, auth_header: Ann
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
 @router.put("/user_all", response_model=UserRead )
-async def update_user(update_data: UserUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+async def update_user_all_colums(update_data: UserUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:
         auth_user = await UserAuthService(db).verify_current_user(auth_header)
         if auth_user:

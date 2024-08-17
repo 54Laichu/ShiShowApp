@@ -11,7 +11,7 @@ class UserService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create_user(self, user: UserCreate) -> User:
+    async def create_user(self, user: UserCreate):
         db_user = User(
             name=user.name,
             email=user.email,

@@ -63,7 +63,7 @@ class UserAuth {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			throw new Error(errorData.detail || 'Login failed');
+			throw new Error(errorData.detail || '登入失敗');
 		}
 
 		const data = await response.json();

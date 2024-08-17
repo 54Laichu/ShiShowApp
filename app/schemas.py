@@ -39,6 +39,14 @@ class UserPassport(SQLModel):
     class Config:
         orm_mode = True
 
+class CoachPassport(SQLModel):
+    id: int
+    name: str
+    account: str
+
+    class Config:
+        orm_mode = True
+
 class UserRead(SQLModel):
     id: int
     name: str
@@ -50,7 +58,23 @@ class UserRead(SQLModel):
     class Config:
         orm_mode = True
 
+class CoachRead(SQLModel):
+    id: int
+    name: str
+    account: str
+    email: str
+    cities: Optional[List[str]] = None
+    course_categories: Optional[List[str]] = None
+    coaches: Optional[List[str]] = None
+
+    class Config:
+        orm_mode = True
+
 class UserLogin(SQLModel):
+    email: EmailStr
+    password: str
+
+class CoachLogin(SQLModel):
     email: EmailStr
     password: str
 
