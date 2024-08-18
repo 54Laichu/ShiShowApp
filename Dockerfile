@@ -35,4 +35,4 @@ RUN npx tailwindcss -i ./app/static/css/main.css -o ./app/static/css/output.css 
 EXPOSE 8000
 
 # Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "ENV=${ENV:-dev} uvicorn main:app --host 0.0.0.0 --port 8000"]
