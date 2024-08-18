@@ -40,7 +40,6 @@ class UserAuthService:
             if user_id is None:
                 raise HTTPException(status_code=401, detail="無效 token")
 
-            # 使用 selectinload 一次性加載所有相關數據
             user_query = (
                 select(User)
                 .options(
