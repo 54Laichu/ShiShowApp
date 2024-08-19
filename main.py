@@ -4,12 +4,13 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
 from app.api.v1 import user_controller, course_category_controller, city_controller, coach_controller
 import os
+from app.settings.config import settings
 
 app = FastAPI()
 
 # https://fastapi.tiangolo.com/reference/staticfiles/
 app.mount("/static", StaticFiles(directory="./app/static"), name="static")
-if os.getenv('ENV') != 'prod':
+if settings.ENV != 'prod':
   app.mount("/uploads", StaticFiles(directory="./uploads"), name="uploads")
 
 

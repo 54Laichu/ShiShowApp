@@ -8,6 +8,7 @@ ENV = os.getenv("ENV", "dev")
 load_dotenv(f".env.{ENV}")
 
 class Setting(BaseSettings):
+  ENV: str
   DB_URL: str
   JWT_SECRET_KEY: str
   JWT_ALGORITHM: str

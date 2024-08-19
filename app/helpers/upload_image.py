@@ -3,6 +3,7 @@ import shutil
 import boto3
 from app.settings.config import settings
 from fastapi import UploadFile
+from app.settings.config import settings
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -21,7 +22,7 @@ async def upload_image(img: UploadFile, account: str):
     try:
             file_type = os.path.splitext(img.filename)[1].lower()
             new_filename = account + file_type
-            if os.getenv('ENV') == 'prod':
+            if settings.ENV == 'prod':
                     # 如果正式環境，上傳到 S3
                     s3_file_key = f"/coach/profile_photo/{new_filename}"
                     s3_client.upload_fileobj(img.file, S3_BUCKET_NAME, s3_file_key)
