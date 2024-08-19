@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Header, UploadFile, Form, File
+from fastapi import APIRouter, Depends, HTTPException, Header, UploadFile, Form, File, Query
 from fastapi.responses import JSONResponse
 from app.schemas import CoachCreate, CoachLogin, CoachPassport, CoachRead, CoachProfilePhotoPassport, CoachUpdate, CoachProfilePhotoPassport
+from app.models import Coach
 from app.services.coach_service import CoachService, CoachAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Optional
+from sqlalchemy.orm import joinedload
+from typing import Optional, List
+from sqlmodel import select
 
 from app.database import get_session
 from typing import Any, Annotated
@@ -41,6 +44,35 @@ async def get_coach_center_data(auth_header: Annotated[str, Header(alias="Author
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
+@router.get("/coaches")
+async def coaches_index(db: AsyncSession = Depends(get_session), course_category_name: Annotated[Optional[str], Query()] = None, keyword: Annotated[Optional[str], Query()] = None)-> list:
+    try:
+            query = select(Coach).options(joinedload(Coach.course_categories))
+
+            if course_category_name != None:
+                query = query.filter(Coach.course_categories.any(name=course_category_name))
+
+            if keyword:
+                query = query.filter(Coach.name.ilike(f"%{keyword}%"))
+
+            result = await db.execute(query)
+            coaches = result.unique().scalars().all()
+
+            return [
+            {
+                "name": coach.name,
+                "bio": coach.bio,
+                "account": coach.account,
+                "id": coach.id,
+                "profile_photo": coach.profile_photo
+            }
+            for coach in coaches
+            ]
+    except Exception as e:
+        print(f"Error retrieving coaches: {str(e)}")
+        raise HTTPException(status_code=500, detail={"error": True, "message": str(e)})
+
+
 # Update coach data
 @router.put("/coach", response_model=CoachProfilePhotoPassport)
 async def updat_coach_data(
@@ -73,5 +105,5 @@ async def updat_coach_data(
         else:
             return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
     except Exception as e:
-        print(f"Error updating user: {str(e)}")
+        print(f"上傳失敗: {str(e)}")
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})

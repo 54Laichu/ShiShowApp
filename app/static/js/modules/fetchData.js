@@ -23,3 +23,18 @@ export async function fetchCourseCategories() {
 	  throw error
   }
 }
+
+export async function fetchCategoryCoach(categoryName) {
+	try {
+			const response = await fetch(`/api/v1/coaches?category_name=${encodeURIComponent(categoryName)}`, {
+					method: "GET",
+					headers: {
+							'Content-Type': 'application/json',
+					},
+			});
+			return await response.json();
+	} catch (error) {
+			throw error;
+	}
+}
+

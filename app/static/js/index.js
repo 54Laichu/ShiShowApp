@@ -8,11 +8,12 @@ const courseCategories = document.querySelector('#courseCategories')
 async function initApp() {
 	try {
 		const userData = await auth.checkAuth();
-		showAuthenticatedUI(userData);
+    showAuthenticatedUI(userData);
+    showCourseCategories();
 	} catch (error) {
 		console.error(error);
 		showUnauthenticatedUI();
-		showCourseCategories()
+    showCourseCategories();
 	}
 }
 
