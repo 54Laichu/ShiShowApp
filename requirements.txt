@@ -12,3 +12,4 @@ bcrypt
 greenlet
 email-validator
 PyJWT
+python-multipart

@@ -12,5 +12,11 @@ class Setting(BaseSettings):
   JWT_SECRET_KEY: str
   JWT_ALGORITHM: str
   JWT_EXPIRE_DAYS: int
+  AWS_ACCESS_KEY_ID: str
+  AWS_SECRET_ACCESS_KEY: str
+  AWS_REGION: str
+  S3_BUCKET_NAME: str
+  S3_DOMAIN: str
 
 settings = Setting()
+# https://docs.pydantic.dev/latest/concepts/pydantic_settings/

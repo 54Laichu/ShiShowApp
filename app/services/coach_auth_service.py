@@ -109,6 +109,7 @@ class CoachAuthService:
             coach_read = CoachRead(
                 id=coach.id,
                 name=coach.name,
+                profile_photo=coach.profile_photo,
                 email=coach.email,
                 account=coach.account,
                 certificates=[certificate.name for certificate in coach.certificates],

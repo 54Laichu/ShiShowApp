@@ -75,7 +75,48 @@ class CoachAuth {
 			this.logout();  // 如果驗證失敗，清除 token
 			throw error;
 		}
-  }
+	}
+
+	async updateCoach({ photoFile, account, name, password } = {}, url) {
+	  const formData = new FormData();
+
+		if (photoFile !== undefined) {
+			formData.append('profile_photo', photoFile);
+		}
+		if (name !== undefined) {
+			formData.append('name', name);
+		}
+		if (account !== undefined) {
+			formData.append('account', account);
+		}
+		if (password !== undefined) {
+			formData.append('password', password);
+		}
+
+		if (formData.entries().next().done) {
+			console.log("無修改內容");
+			return null;
+		}
+
+		try {
+			const response = await fetch(`${this.baseUrl}${url}`, {
+				method: 'PUT',
+				headers: {
+					"Authorization": `Bearer ${this.token}`,
+				},
+				body: formData,
+			});
+
+			if (!response.ok) {
+				throw new Error(response.status);
+			}
+			return await response.json();
+
+		} catch (error) {
+			console.error("資料更新失敗", error)
+			throw error;
+		}
+	}
 }
 
 export default CoachAuth;

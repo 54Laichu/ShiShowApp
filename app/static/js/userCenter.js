@@ -68,8 +68,11 @@ document.querySelector('#loginForm').addEventListener('submit', async (event) =>
 });
 
 document.querySelector('#logoutButton').addEventListener('click', () => {
-	auth.logout();
-	showUnauthenticatedUI();
+  const confirmed = confirm('確定要登出嗎？');
+  if (confirmed) {
+    auth.logout();
+    window.location.href = "/";
+  }
 });
 
 document.querySelector('#showRegisterForm').addEventListener('click', () => {
@@ -332,11 +335,3 @@ async function editCourseCategoryForm() {
 feather.replace();
 
 initApp()
-
-document.querySelector('#logoutButton').addEventListener('click', () => {
-  const confirmed = confirm('確定要登出嗎？');
-  if (confirmed) {
-    auth.logout();
-    window.location.href = "/";
-  }
-});

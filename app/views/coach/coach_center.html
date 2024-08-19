@@ -11,8 +11,8 @@
           </div>
           <div class="w-2/4 flex items-center">
             <img id="profilePreview" src="/static/favicon.ico" alt="Profile Photo" class="w-20 h-20 rounded-full object-cover mr-4">
-            <input type="file" id="profilePhotoInput" name="profile_photo" accept="image/*" class="hidden">
-            <label for="profilePhotoInput" class="cursor-pointer bg-gray-200 rounded hover:bg-gray-500 transition duration-300">
+            <input type="file" id="editProfilePhoto" name="profile_photo" accept="image/*" class="hidden">
+            <label for="editProfilePhoto" class="hidden cursor-pointer bg-gray-200 rounded hover:bg-gray-500 transition duration-300">
               選擇照片
             </label>
           </div>
@@ -25,6 +25,15 @@
           <div class="w-2/4 flex items-center">
             <span id="coachName" class="mr-4"></span>
             <input type="text" id="editName" name="name" class="hidden w-full rounded-md bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+          </div>
+        </div>
+        <div class="flex items-center mb-4">
+          <div class="w-1/4">
+            <strong>帳號：</strong>
+          </div>
+          <div class="w-2/4 flex items-center">
+            <span id="coachAccount" class="mr-4"></span>
+            <input type="text" id="editAccount" name="account" class="hidden w-full rounded-md bg-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
           </div>
         </div>
         <div class="flex items-center mb-4">
@@ -116,5 +125,4 @@
   </main>
   {% include 'coach/navbar.html' %}
   <script type="module" src="{{ url_for('static', path='/js/coach/coachCenter.js') }}"></script>
-  <script src="{{ url_for('static', path='/js/coach/modules/profilePhotoUpload.js') }}"></script>
 {% endblock %}

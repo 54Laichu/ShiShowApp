@@ -4,7 +4,7 @@ from sqlmodel import select
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
 from app.settings.config import settings
-from app.models import User, UserCity, City, UserCourseCategory, CourseCategory, UserCoach, Coach
+from app.models import User
 from app.schemas import UserRead, UserPassport
 import jwt
 import bcrypt

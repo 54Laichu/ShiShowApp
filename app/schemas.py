@@ -19,6 +19,12 @@ class UserUpdate(SQLModel):
     name: Optional[str] = None
     password: Optional[str] = None
 
+class CoachUpdate(SQLModel):
+    profile_photo: Optional[str] = None
+    account: Optional[str] = None
+    name: Optional[str] = None
+    password: Optional[str] = None
+
 class UserCitiesUpdate(SQLModel):
     cities: List[str]
 
@@ -47,6 +53,9 @@ class CoachPassport(SQLModel):
     class Config:
         orm_mode = True
 
+class CoachProfilePhotoPassport(CoachPassport):
+    profile_photo: Optional[str] = None
+
 class UserRead(SQLModel):
     id: int
     name: str
@@ -61,6 +70,7 @@ class UserRead(SQLModel):
 class CoachRead(SQLModel):
     id: int
     name: str
+    profile_photo: Optional[str] = None
     account: str
     email: str
     certificates: Optional[List[str]] = None

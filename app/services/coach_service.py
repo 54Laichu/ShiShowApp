@@ -2,12 +2,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from typing import Optional
 from app.models import CourseCategory, City, Coach
-from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport
+from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachUpdate, CoachProfilePhotoPassport
 from app.helpers.password_hash import get_password_hash
 from app.services.coach_auth_service import CoachAuthService
 from fastapi import HTTPException
 import jwt
 from app.settings.config import settings
+from app.helpers.upload_image import upload_image
+import logging
+
+logger = logging.getLogger()
 
 class CoachService:
     def __init__(self, db: AsyncSession):
@@ -91,3 +95,39 @@ class CoachService:
 
         except Exception as e:
             raise HTTPException(status_code=401, detail="身份驗證失敗")
+
+    async def update_coach(self, coach_id: int, update_data: dict) -> CoachProfilePhotoPassport:
+        try:
+            query = (select(Coach).filter(Coach.id == coach_id))
+            result = await self.db.execute(query)
+            coach = result.scalar_one_or_none()
+
+            if not coach:
+                raise HTTPException(status_code=404, detail="查無此帳號")
+
+            if update_data.get("name"):
+                        coach.name = update_data["name"]
+
+            if update_data.get("account"):
+                        coach.account = update_data["account"]
+
+            if update_data.get("profile_photo"):
+                profile_photo_url = await upload_image(update_data["profile_photo"], coach.account)
+                coach.profile_photo = profile_photo_url
+
+            if update_data.get("password"):
+                coach.hashed_password = get_password_hash(update_data["password"])
+
+            await self.db.commit()
+            await self.db.refresh(coach)
+
+            return CoachProfilePhotoPassport(
+                id=coach.id,
+                profile_photo=coach.profile_photo,
+                name=coach.name,
+                account=coach.account,
+                email=coach.email
+            )
+        except Exception as e:
+            logger.error(f"Unexpected error during coach verification: {e}")
+            raise HTTPException(status_code=401, detail=f"str{e}")
