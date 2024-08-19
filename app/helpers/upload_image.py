@@ -23,7 +23,7 @@ async def upload_image(img: UploadFile, account: str):
     try:
             file_type = os.path.splitext(img.filename)[1].lower()
             now = datetime.now()
-            new_filename = now + account + file_type
+            new_filename = now.strftime('%y%m%d%H%M%S') + account + file_type
             if settings.ENV == 'prod':
                     # 如果正式環境，上傳到 S3
                     s3_file_key = f"coach/profile_photo/{new_filename}"
