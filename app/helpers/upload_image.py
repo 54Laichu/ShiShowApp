@@ -24,7 +24,7 @@ async def upload_image(img: UploadFile, account: str):
             new_filename = account + file_type
             if settings.ENV == 'prod':
                     # 如果正式環境，上傳到 S3
-                    s3_file_key = f"/coach/profile_photo/{new_filename}"
+                    s3_file_key = f"coach/profile_photo/{new_filename}"
                     s3_client.upload_fileobj(img.file, S3_BUCKET_NAME, s3_file_key)
                     s3_url = f"https://{S3_DOMAIN}{s3_file_key}"
             else:
