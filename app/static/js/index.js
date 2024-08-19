@@ -1,6 +1,9 @@
 import UserAuth from './modules/userAuth.js';
+import { fetchCities, fetchCourseCategories } from "./modules/fetchData.js";
 
 const auth = new UserAuth('/api/v1');
+
+const courseCategories = document.querySelector('#courseCategories')
 
 async function initApp() {
 	try {
@@ -9,6 +12,7 @@ async function initApp() {
 	} catch (error) {
 		console.error(error);
 		showUnauthenticatedUI();
+		showCourseCategories()
 	}
 }
 
@@ -37,6 +41,34 @@ function hideLoginForm() {
 function redirectToRegister() {
   window.location.href = '/register';
 }
+
+async function showCourseCategories() {
+    const courseCategoriesData = await fetchCourseCategories();
+
+    courseCategoriesData.forEach(category => {
+        const link = document.createElement('a');
+        link.href = `/course_category/${category.name}`;
+        link.className = 'bg-white rounded-lg shadow overflow-hidden';
+
+        const img = document.createElement('img');
+        img.src = `https://fakeimg.pl/300x200/010101,128/000,255/?text=${encodeURIComponent(category.name)}&font=noto`;
+        img.alt = `${category.name}課程`;
+        img.className = 'w-full h-32 object-cover';
+
+        const div = document.createElement('div');
+        div.className = 'p-2';
+
+        const p = document.createElement('p');
+        p.className = 'text-center font-semibold';
+        p.textContent = `✨精選${category.name}課程✨`;
+
+        div.appendChild(p);
+        link.appendChild(img);
+        link.appendChild(div);
+        courseCategories.appendChild(link);
+    });
+}
+
 
 document.querySelector('#unauthenticatedContent').addEventListener('click', showLoginForm);
 document.querySelector('#closeLoginForm').addEventListener('click', hideLoginForm);

@@ -89,6 +89,14 @@ async def get_user_auth(auth_header: Annotated[str, Header(alias="Authorization"
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
 
+@router.get("/user/prefer_data", response_model=UserPassport)
+async def get_user_prefer_data(auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        user = await UserAuthService(db).verify_current_user(auth_header)
+        return user
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
 @router.get("/user_center", response_model=UserRead)
 async def get_user_center_data(auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
     try:

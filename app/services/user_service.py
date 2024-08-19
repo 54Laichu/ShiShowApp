@@ -137,18 +137,10 @@ class UserService:
                 raise ValueError("User not found")
 
             if user_data.course_categories is not None:
-                # 批量查詢所有城市資料
                 course_category_query = select(CourseCategory).where(CourseCategory.name.in_(user_data.course_categories))
                 course_categories_result = await self.db.execute(course_category_query)
                 course_categories = course_categories_result.scalars().all()
 
-            # 檢查是否有任何無效的城市
-            valid_course_category_names = {course_category.name for course_category in course_categories}
-            invalid_course_categories = set(user_data.course_categories) - valid_course_category_names
-            if invalid_course_categories:
-                raise ValueError(f"Invalid course_categories: {', '.join(invalid_course_categories)}")
-
-            # 更新用戶的城市
             user.course_categories = course_categories
 
             await self.db.commit()

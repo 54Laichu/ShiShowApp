@@ -133,6 +133,3 @@ document.addEventListener('DOMContentLoaded', async function () {
 	});
 });
 
-window.goBack = () => {
-	window.history.back();
-};
