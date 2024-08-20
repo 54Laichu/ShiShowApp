@@ -1,12 +1,11 @@
 {% extends 'inner_base.html' %}
 {% block content %}
 <main>
-  <h1>所在地教練</h1>
-  <div id="cityCoach">
-    <div></div>
+  <h1 class="text-xl font-semibold">專業教練</h1>
+  <div id="cityCoach" class="my-5 ">
   </div>
 </main>
 
-
+{% include "login.html" %}
 <script type="module" src="{{ url_for('static', path='/js/courseCategory.js') }}"></script>
 {% endblock %}
