@@ -6,6 +6,7 @@ async function initApp() {
 	try {
 		const coachData = await auth.checkAuth();
 		showAuthenticatedUI(coachData);
+		showUserInvites()
 	} catch (error) {
 		console.error(error);
 		showUnauthenticatedUI();
@@ -64,6 +65,18 @@ document.querySelector('#logoutButton').addEventListener('click', () => {
 window.onclick = function(event) {
 	if (event.target == document.querySelector('#loginFormModal')) {
 		hideLoginForm();
+	}
+}
+
+async function showUserInvites() {
+	const response = await fetch(`${window.location.origin}/api/v1/user_coach`, {
+		method: 'GET',
+		headers: { "Authorization": `Bearer ${localStorage.getItem('token')}`}
+	})
+
+	if (response.ok) {
+		let users = await response.json()
+		console.log(users);
 	}
 }
 

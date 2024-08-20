@@ -98,7 +98,7 @@ function populateCoachesInfo(coaches) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            coach: coach.id,
+            coach_id: coach.id,
           }),
         });
 
