@@ -10,6 +10,9 @@ class UserBase(SQLModel):
     phone: str = Field(unique=True)
     is_active: bool = Field(default=True)
 
+class UserCoachCreate(SQLModel):
+    coach_id: int
+
 class UserCreate(UserBase):
     password: str
     cities: List[str]

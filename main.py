@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from app.api.v1 import user_controller, course_category_controller, city_controller, coach_controller
+from app.api.v1 import user_controller, course_category_controller, city_controller, coach_controller, user_coach_controller
 import os
 from app.settings.config import settings
 
@@ -51,6 +51,7 @@ async def show(request: Request):
 
 app.include_router(coach_controller.router, prefix="/api/v1", tags=["Coach"])
 app.include_router(user_controller.router, prefix="/api/v1", tags=["User"])
+app.include_router(user_coach_controller.router, prefix="/api/v1", tags=["UserCoach"])
 app.include_router(course_category_controller.router, prefix="/api/v1", tags=["CourseCategory"])
 app.include_router(city_controller.router, prefix="/api/v1", tags=["City"])
 

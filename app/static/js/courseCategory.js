@@ -88,8 +88,26 @@ function populateCoachesInfo(coaches) {
       try {
         await auth.checkAuth();
         console.log('提出綁定申請');
-      } catch {
-        showLoginForm()
+        console.log('更新版');
+        console.log(coach.id);
+
+        let response = await fetch(`${window.location.origin}/api/v1/user_coach`, {
+          method: 'POST',
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            coach: coach.id,
+          }),
+        });
+
+        const result = await response.json();
+        console.log(result.message);
+        alert(result.message);
+      } catch (error) {
+        console.error(error);
+        showLoginForm();
       }
     };
 

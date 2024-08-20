@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import JSONResponse
 from app.schemas import UserCreate, UserRead, UserLogin, UserUpdate, UserPassport, UserCitiesUpdate, UserCourseCategoriessUpdate
+from app.models import UserCoach
 from app.services.user_service import UserService
 from app.services.user_auth_service import UserAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -104,3 +105,6 @@ async def get_user_center_data(auth_header: Annotated[str, Header(alias="Authori
         return user
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+
+
