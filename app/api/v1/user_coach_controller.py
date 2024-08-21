@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from fastapi.responses import JSONResponse
-from app.models import UserCoach, User
+from app.models import UserCoach, User, Coach
 from sqlalchemy.orm import joinedload
-from app.schemas import UserCoachCreate, UserCoachUpdate
+from app.schemas import UserCoachCreate, UserCoachUpdate, UserCoachDelete, UserCoachRead
 from app.services.user_auth_service import UserAuthService
 from app.services.coach_auth_service import CoachAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -91,7 +91,11 @@ async def update_user_coach(
 	try:
 		coach = await CoachAuthService(db).verify_current_coach(auth_header)
 
-		query = (select(UserCoach).where(UserCoach.user_id == user_coach_data.user_id and UserCoach.coach_id == coach.id))
+		query = select(UserCoach).where(
+			(UserCoach.user_id == user_coach_data.user_id) &
+			(UserCoach.coach_id == coach.id)
+			)
+
 		result = await db.execute(query)
 		user_coach = result.scalar_one_or_none()
 
@@ -103,6 +107,36 @@ async def update_user_coach(
 			user_coach.status = "rejected"
 			await db.commit()
 			return JSONResponse(status_code=200, content={"message": "已拒絕！"})
+
+	except Exception as e:
+		logger.error(f"Unexpected error during coach verification: {e}")
+		raise HTTPException(status_code=500,  detail="失敗，請與管理員聯繫")
+
+
+
+
+# 使用者解除綁定
+@router.delete("/user_coach")
+async def delete_user_coach(
+	user_coach_data: UserCoachDelete,
+	auth_header: Annotated[str, Header(alias="Authorization")],
+	db: AsyncSession = Depends(get_session)) -> JSONResponse:
+	try:
+		user = await UserAuthService(db).verify_current_user(auth_header)
+
+		query = select(UserCoach).where(
+			(UserCoach.user_id == user.id) &
+			(UserCoach.coach_id == user_coach_data.coach_id)
+			)
+		result = await db.execute(query)
+		user_coach = result.scalar_one_or_none()
+
+		if user_coach and user_coach.status == "accepted":
+			await db.delete(user_coach)
+			await db.commit()
+			return JSONResponse(status_code=200, content={"message": "已解除綁定！"})
+		else:
+			raise HTTPException(status_code=400, detail="只能解除已接受的綁定")
 
 	except Exception as e:
 		logger.error(f"Unexpected error during coach verification: {e}")

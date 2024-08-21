@@ -66,32 +66,11 @@
     </section>
 
     <!-- 已綁定教練清單 -->
-    <section class="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">已綁定教練</h2>
-      <ul id="trainerList" class="space-y-4">
-        <li class="flex justify-between items-center">
-          <span>陳教練（瑜珈）</span>
-          <div>
-            <button onclick="sendMessage('陳教練')" class="text-gray-500 hover:text-orange-700 mr-2">
-              <i data-feather="message-square"></i>
-            </button>
-            <button onclick="unbindTrainer('陳教練')" class="text-red-500 hover:text-red-700">
-              <i data-feather="user-minus"></i>
-            </button>
-          </div>
-        </li>
-        <li class="flex justify-between items-center">
-          <span>李教練（重訓）</span>
-          <div>
-            <button onclick="sendMessage('李教練')" class="text-gray-500 hover:text-orange-700 mr-2">
-              <i data-feather="message-square"></i>
-            </button>
-            <button onclick="unbindTrainer('李教練')" class="text-red-500 hover:text-red-700">
-              <i data-feather="user-minus"></i>
-            </button>
-          </div>
-        </li>
-      </ul>
+    <section id="coach" class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">已綁定的教練</h2>
+      </div>
+      <ul id="coachList"></ul>
     </section>
 
     <div id="logoutButton" class="bg-red-500 rounded-lg p-6 text-center cursor-pointer hover:bg-red-600">

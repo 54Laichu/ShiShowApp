@@ -6,12 +6,14 @@ const auth = new UserAuth('/api/v1');
 async function initApp() {
 	try {
     const userData = await auth.fetchUserCenter();
+    console.log(userData);
     const userCities = document.querySelector('#userCities');
     const userCourseCategories = document.querySelector('#userCourseCategories');
+    const coachList = document.querySelector('#coachList');
     showUser(userData);
-    showUserCities(userData.cities, userCities)
-    showUserCourseCategories(userData.course_categories, userCourseCategories)
-    // console.log(userData);
+    showUserCities(userData.cities, userCities);
+    showUserCourseCategories(userData.course_categories, userCourseCategories);
+    showUserCoaches(userData.coaches, coachList);
     editUserForm();
     editCityForm();
     editCourseCategoryForm();
@@ -47,12 +49,93 @@ function showUserCourseCategories(courseCategoriesArray, container) {
 	});
 }
 
+function showUserCoaches(coachesArray, container) {
+  coachesArray.forEach(coach => {
+    const li = document.createElement('li');
+    li.classList.add('flex', 'justify-between', 'items-center');
+
+    // Profile Photo
+    const coachProfilePhoto = document.createElement('div');
+    coachProfilePhoto.className = 'coach-profile-photo';
+    const imgElement = document.createElement('img');
+    imgElement.classList.add('w-20', 'h-20', 'rounded-full', 'object-cover', 'shadow-sm');
+
+    if (coach.coach_profile_photo) {
+      let url = coach.coach_profile_photo;
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        imgElement.src = coach.profile_photo;
+      } else {
+        const BASE_URL = `${window.location.origin}`;
+        imgElement.src = `${BASE_URL}/${url}`;
+      }
+    } else {
+      imgElement.src = "/static/favicon.ico";
+    }
+    imgElement.alt = `${coach.name}'s profile photo`;
+    coachProfilePhoto.appendChild(imgElement);
+    li.appendChild(coachProfilePhoto);
+
+    // Name & Account
+    const spanElement = document.createElement('span');
+    spanElement.textContent = `${coach.coach_name}（暱稱: ${coach.coach_account}）`;
+    spanElement.classList.add('text-l');
+    li.appendChild(spanElement);
+
+    // DELETE Btn
+    const divElement = document.createElement('div');
+    const button = document.createElement('button');
+    button.className = 'bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300';
+    button.onclick = async () => {
+      if (await unbindCoach(coach.coach_id)) {
+          li.remove(); // 直接刪除整個 li 元素
+      }
+  };
+
+    const buttonText = document.createElement('p');
+    buttonText.textContent = '解除綁定';
+    button.appendChild(buttonText);
+
+    divElement.appendChild(button);
+    li.appendChild(divElement);
+
+    container.appendChild(li);
+  });
+}
+
+async function unbindCoach(coachId) {
+  try {
+    const response = await fetch(`${window.location.origin}/api/v1/user_coach`, {
+      method: 'DELETE',
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ coach_id: coachId })
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    alert(result.message);
+    return true;
+  } catch (error) {
+    alert(error);
+    return false;
+  }
+}
+
+
+// --- Login form
 function showLoginForm() {
   document.querySelector('#loginFormModal').style.display = 'block';
   document.querySelector('#closeLoginForm').style.display = 'none';
 }
 
-// --- Login form
 document.querySelector('#loginForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const email = document.querySelector('#email').value;

@@ -47,7 +47,7 @@ async def get_coach_center_data(auth_header: Annotated[str, Header(alias="Author
 @router.get("/coaches")
 async def coaches_index(db: AsyncSession = Depends(get_session), course_category_name: Annotated[Optional[str], Query()] = None, keyword: Annotated[Optional[str], Query()] = None)-> list:
     try:
-            query = select(Coach).options(joinedload(Coach.course_categories))
+            query = select(Coach).join(Coach.course_categories)
 
             if course_category_name != None:
                 query = query.where(Coach.course_categories.any(name=course_category_name))

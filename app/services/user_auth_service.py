@@ -4,7 +4,7 @@ from sqlmodel import select
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
 from app.settings.config import settings
-from app.models import User
+from app.models import User, UserCoach
 from app.schemas import UserRead, UserPassport
 import jwt
 import bcrypt
@@ -45,9 +45,9 @@ class UserAuthService:
                 .options(
                     selectinload(User.cities),
                     selectinload(User.course_categories),
-                    selectinload(User.coaches)
+                    selectinload(User.coaches.and_(UserCoach.status == "accepted"))
                 )
-                .where(User.id == user_id)
+                .where((User.id == user_id))
             )
             result = await self.db.execute(user_query)
             user = result.scalar_one_or_none()
@@ -61,14 +61,14 @@ class UserAuthService:
                 email=user.email,
                 cities=[city.name for city in user.cities],
                 course_categories=[category.name for category in user.course_categories],
-                coaches=[coach.name for coach in user.coaches]
+                coaches=[{"coach_name":coach.name, "coach_id":coach.id, "coach_account":coach.account, "coach_profile_photo": coach.profile_photo} for coach in user.coaches]
             )
             return user_read
 
         except Exception as e:
             raise HTTPException(status_code=401, detail="Authentication failed")
 
-    async def verify_current_user(self, auth_header: str) -> UserRead:
+    async def verify_current_user(self, auth_header: str):
         try:
             scheme, token = auth_header.split(" ")
             if scheme.lower() != 'bearer':

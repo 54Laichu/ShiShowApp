@@ -13,6 +13,12 @@ class UserBase(SQLModel):
 class UserCoachCreate(SQLModel):
     coach_id: int
 
+class UserCoachDelete(SQLModel):
+    coach_id: int
+
+class UserCoachRead(SQLModel):
+    coach_id: int
+
 class UserCoachUpdate(SQLModel):
     user_id: int
     status: str
@@ -69,7 +75,7 @@ class UserRead(SQLModel):
     email: str
     cities: Optional[List[str]] = None
     course_categories: Optional[List[str]] = None
-    coaches: Optional[List[str]] = None
+    coaches: Optional[List[dict]] = None
 
     class Config:
         orm_mode = True
