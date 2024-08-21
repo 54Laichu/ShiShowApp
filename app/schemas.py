@@ -108,6 +108,14 @@ class CoachCreate(CoachBase):
     cities: List[str]
     course_categories: List[str]
 
+class CourseCategoryRead(SQLModel):
+    id: int
+    name: str
+
+class CityRead(SQLModel):
+    id: int
+    name: str
+
 class CheckCity(Enum):
     TPE = "臺北市"
     NTP = "新北市"
