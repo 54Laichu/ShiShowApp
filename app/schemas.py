@@ -13,6 +13,10 @@ class UserBase(SQLModel):
 class UserCoachCreate(SQLModel):
     coach_id: int
 
+class UserCoachUpdate(SQLModel):
+    user_id: int
+    status: str
+
 class UserCreate(UserBase):
     password: str
     cities: List[str]
