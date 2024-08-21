@@ -50,10 +50,10 @@ async def coaches_index(db: AsyncSession = Depends(get_session), course_category
             query = select(Coach).options(joinedload(Coach.course_categories))
 
             if course_category_name != None:
-                query = query.filter(Coach.course_categories.any(name=course_category_name))
+                query = query.where(Coach.course_categories.any(name=course_category_name))
 
             if keyword:
-                query = query.filter(Coach.name.ilike(f"%{keyword}%"))
+                query = query.where(Coach.name.ilike(f"%{keyword}%"))
 
             result = await db.execute(query)
             coaches = result.unique().scalars().all()

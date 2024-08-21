@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, or_
 from typing import Optional
 from app.models import User, CourseCategory, City, Coach
 from app.schemas import UserCreate, CheckCity, CheckCourseCategory, UserRead, UserUpdate, UserCitiesUpdate, UserCourseCategoriessUpdate
@@ -23,7 +23,7 @@ class UserService:
         if user.cities:
             for city in user.cities:
                 if city in [item.value for item in CheckCity]:
-                    db_city = await self.db.execute(select(City).filter(City.name == city))
+                    db_city = await self.db.execute(select(City).where(City.name == city))
                     db_city = db_city.scalar_one_or_none()
                     if db_city:
                         db_user.cities.append(db_city)
@@ -35,7 +35,7 @@ class UserService:
         if user.course_categories:
             for category in user.course_categories:
                 if category in [item.value for item in CheckCourseCategory]:
-                    db_category = await self.db.execute(select(CourseCategory).filter(CourseCategory.name == category))
+                    db_category = await self.db.execute(select(CourseCategory).where(CourseCategory.name == category))
                     db_category = db_category.scalar_one_or_none()
                     if db_category:
                         db_user.course_categories.append(db_category)
@@ -52,12 +52,12 @@ class UserService:
         return token
 
     async def get_user_by_phone_email(self, email: Optional[str], phone: Optional[str]) -> User | None:
-        result = await self.db.execute(select(User).filter((User.email == email) | (User.phone == phone)))
+        result = await self.db.execute(select(User).where(or_(User.email == email, User.phone == phone)))
         return result.scalar_one_or_none()
 
     async def update_user(self, user_id: int, user_data: UserUpdate):
         try:
-            query = (select(User).filter(User.id == user_id))
+            query = (select(User).where(User.id == user_id))
             result = await self.db.execute(query)
             user = result.scalar_one_or_none()
 
@@ -97,18 +97,16 @@ class UserService:
                 raise ValueError("User not found")
 
             if user_data.cities is not None:
-                # 批量查詢所有城市資料
                 city_query = select(City).where(City.name.in_(user_data.cities))
                 cities_result = await self.db.execute(city_query)
                 cities = cities_result.scalars().all()
 
-            # 檢查是否有任何無效的城市
+            # 檢查是否混入名單外城市資料
             valid_city_names = {city.name for city in cities}
             invalid_cities = set(user_data.cities) - valid_city_names
             if invalid_cities:
                 raise ValueError(f"Invalid cities: {', '.join(invalid_cities)}")
 
-            # 更新用戶的城市
             user.cities = cities
 
             await self.db.commit()

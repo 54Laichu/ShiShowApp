@@ -102,7 +102,7 @@ class UserAuthService:
             raise HTTPException(status_code=401, detail="身份驗證失敗")
 
     async def login(self, email: str, password: str) -> JSONResponse:
-        user = await self.db.execute(select(User).filter(User.email == email))
+        user = await self.db.execute(select(User).where(User.email == email))
         user = user.scalar_one_or_none()
         if user and bcrypt.checkpw(password.encode('utf-8'), user.hashed_password.encode('utf-8')):
             encode_content = {

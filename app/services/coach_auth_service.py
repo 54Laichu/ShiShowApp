@@ -27,7 +27,7 @@ class CoachAuthService:
         return JSONResponse(status_code=200, content={"access_token": access_token, "token_type": "bearer"})
 
     async def login(self, email: str, password: str) -> JSONResponse:
-        coach = await self.db.execute(select(Coach).filter(Coach.email == email))
+        coach = await self.db.execute(select(Coach).where(Coach.email == email))
         coach = coach.scalar_one_or_none()
         if coach and bcrypt.checkpw(password.encode('utf-8'), coach.hashed_password.encode('utf-8')):
             encode_content = {

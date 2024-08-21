@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, or_
 from typing import Optional
 from app.models import CourseCategory, City, Coach
 from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachUpdate, CoachProfilePhotoPassport
@@ -18,7 +18,7 @@ class CoachService:
         self.db = db
 
     async def get_coach_by_phone_email(self, email: Optional[str], phone: Optional[str]) -> Coach | None:
-        result = await self.db.execute(select(Coach).filter((Coach.email == email) | (Coach.phone == phone)))
+        result = await self.db.execute(select(Coach).where(or_(Coach.email == email, Coach.phone == phone)))
         return result.scalar_one_or_none()
 
     async def create_coach(self, coach: CoachCreate):
@@ -34,7 +34,7 @@ class CoachService:
         if coach.cities:
             for city in coach.cities:
                 if city in [item.value for item in CheckCity]:
-                    db_city = await self.db.execute(select(City).filter(City.name == city))
+                    db_city = await self.db.execute(select(City).where(City.name == city))
                     db_city = db_city.scalar_one_or_none()
                     if db_city:
                         db_coach.cities.append(db_city)
@@ -46,7 +46,7 @@ class CoachService:
         if coach.course_categories:
             for category in coach.course_categories:
                 if category in [item.value for item in CheckCourseCategory]:
-                    db_category = await self.db.execute(select(CourseCategory).filter(CourseCategory.name == category))
+                    db_category = await self.db.execute(select(CourseCategory).where(CourseCategory.name == category))
                     db_category = db_category.scalar_one_or_none()
                     if db_category:
                         db_coach.course_categories.append(db_category)
@@ -98,7 +98,7 @@ class CoachService:
 
     async def update_coach(self, coach_id: int, update_data: dict) -> CoachProfilePhotoPassport:
         try:
-            query = (select(Coach).filter(Coach.id == coach_id))
+            query = (select(Coach).where(Coach.id == coach_id))
             result = await self.db.execute(query)
             coach = result.scalar_one_or_none()
 

@@ -25,7 +25,10 @@ async def create_or_set_pending_user_coach(
 	try:
 		user = await UserAuthService(db).verify_current_user(auth_header)
 
-		query = (select(UserCoach).where(UserCoach.user_id == user.id and UserCoach.coach_id == coach_data.coach_id))
+		query = select(UserCoach).where(
+					(UserCoach.user_id == user.id) &
+					(UserCoach.coach_id == coach_data.coach_id)
+				)
 		result = await db.execute(query)
 		user_coach = result.scalar_one_or_none()
 
@@ -54,7 +57,10 @@ async def get_user_coach(auth_header: Annotated[str, Header(alias="Authorization
 		query = (
 			select(UserCoach, User.name.label("user_name"), User.phone.label("user_phone"))
 			.join(User, UserCoach.user_id == User.id)
-			.filter(UserCoach.coach_id == coach.id)
+			.where(
+					(UserCoach.coach_id == coach.id) &
+					(UserCoach.status == "pending")
+				)
 		)
 
 		result = await db.execute(query)
