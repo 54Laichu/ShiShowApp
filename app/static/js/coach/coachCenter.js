@@ -57,7 +57,7 @@ function showCoachGyms(gymsArray, container) {
   gymsArray.forEach(gym => {
     const gymElement = document.createElement('span');
     gymElement.classList.add('bg-green-100', 'text-green-800', 'px-3', 'py-1', 'rounded-full', 'text-sm');
-		gymElement.value = gym.name;
+		gymElement.id = gym.id;
 		gymElement.textContent = `${gym.name}   ｜地址： ${gym.address}`;
 		container.appendChild(gymElement);
 	});
@@ -392,6 +392,15 @@ async function editGymForm(cities) {
   let gyms = [];
   let selectedGyms = [];
 
+  function getCurrentCoachGyms() {
+    const gymElements = coachGyms.querySelectorAll('span');
+    return Array.from(gymElements).map(element => ({
+      id: element.id,
+      name: element.textContent.split('｜')[0].trim(),
+      address: element.textContent.split('｜')[1].replace('地址：', '').trim()
+    }));
+  }
+
   async function fetchGyms(cityId) {
     try {
       const response = await fetch(`${window.location.origin}/api/v1/gyms?city_id=${cityId}`);
@@ -410,7 +419,7 @@ async function editGymForm(cities) {
     selectedGymsList.innerHTML = '';
     selectedGyms.forEach(gym => {
       const span = document.createElement('span');
-      span.textContent = gym.name;
+      span.textContent = `${gym.name} | ${gym.address}`;
       span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
 
       const removeButton = document.createElement('button');
@@ -428,6 +437,8 @@ async function editGymForm(cities) {
 
   editGymsButton.addEventListener('click', () => {
     editGymsModal.classList.remove('hidden');
+    selectedGyms = getCurrentCoachGyms();
+    updateSelectedGymsList();
     populateCitiesSelect();
   });
 
@@ -488,7 +499,7 @@ async function editGymForm(cities) {
     try {
       const updatedCoachData = await auth.updateCoachGyms(selectedGyms.map(gym => gym.id), url);
       if (updatedCoachData) {
-        updateCoachGymsList(updatedCoachData.gyms, coachGyms);
+        updateCoachGymsList(updatedCoachData.gyms);
         editGymsModal.classList.add('hidden');
         console.log(updatedCoachData);
         alert('場館更新成功！');
@@ -499,15 +510,14 @@ async function editGymForm(cities) {
     }
   });
 
-  function updateCoachGymsList(gymsArray, container) {
-    const coachGymsElement = document.querySelector('#coachGyms');
-    coachGymsElement.innerHTML = '';
+  function updateCoachGymsList(gymsArray) {
+    coachGyms.innerHTML = '';
     gymsArray.forEach(gym => {
       const gymElement = document.createElement('span');
       gymElement.classList.add('bg-green-100', 'text-green-800', 'px-3', 'py-1', 'rounded-full', 'text-sm');
-      gymElement.value = gym.name;
-      gymElement.textContent = `${gym.name}   ｜地址： ${gym.address}`;
-      container.appendChild(gymElement);
+      gymElement.id = gym.id;
+      gymElement.textContent = `${gym.name} ｜地址： ${gym.address}`;
+      coachGyms.appendChild(gymElement);
     });
   }
 }
