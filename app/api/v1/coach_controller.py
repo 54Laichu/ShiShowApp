@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, UploadFile, Form, File, Query
 from fastapi.responses import JSONResponse
-from app.schemas import CoachCreate, CoachLogin, CoachPassport, CoachRead, CoachProfilePhotoPassport, CoachUpdate, CoachProfilePhotoPassport
+from app.schemas import CoachCreate, CoachLogin, CoachPassport, CoachRead, CoachProfilePhotoPassport, CoachCitiesUpdate, CoachProfilePhotoPassport, CoachCourseCategoriessUpdate
 from app.models import Coach
 from app.services.coach_service import CoachService, CoachAuthService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -106,4 +106,33 @@ async def updat_coach_data(
             return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
     except Exception as e:
         print(f"上傳失敗: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+
+@router.put("/coach_city", response_model=CoachCitiesUpdate)
+async def update_coach_city(update_data: CoachCitiesUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        auth_coach = await CoachAuthService(db).verify_current_coach(auth_header)
+        if auth_coach:
+            coach_id = auth_coach.id
+            updated_coach = await CoachService(db).update_coach_cities(coach_id, update_data)
+            return updated_coach
+        else:
+            return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
+    except Exception as e:
+        print(f"Error updating user: {str(e)}")
+        return JSONResponse(status_code=500, content={"error": True, "message": str(e)})
+
+@router.put("/coach_course_category", response_model=CoachCourseCategoriessUpdate)
+async def update_coach_course_category(update_data: CoachCourseCategoriessUpdate, auth_header: Annotated[str, Header(alias="Authorization")], db: AsyncSession = Depends(get_session)):
+    try:
+        auth_coach = await CoachAuthService(db).verify_current_coach(auth_header)
+        if auth_coach:
+            coach_id = auth_coach.id
+            updated_coach = await CoachService(db).update_coach_course_categories(coach_id, update_data)
+            return updated_coach
+        else:
+            return JSONResponse(status_code=400, content={"error": True, "message": "查無使用者"})
+    except Exception as e:
+        print(f"Error updating coach: {str(e)}")
         return JSONResponse(status_code=500, content={"error": True, "message": str(e)})

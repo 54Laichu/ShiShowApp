@@ -44,6 +44,18 @@ class UserCitiesUpdate(SQLModel):
     class Config:
         orm_mode = True
 
+class CoachCitiesUpdate(SQLModel):
+    cities: List[str]
+
+    class Config:
+        orm_mode = True
+
+class CoachCourseCategoriessUpdate(SQLModel):
+    course_categories: List[str]
+
+    class Config:
+        orm_mode = True
+
 class UserCourseCategoriessUpdate(SQLModel):
     course_categories: List[str]
 

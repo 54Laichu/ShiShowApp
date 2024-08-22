@@ -6,12 +6,7 @@ const auth = new CoachAuth('/api/v1');
 const coachCities = document.querySelector('#coachCities');
 const coachCourseCategories = document.querySelector('#coachCourseCategories');
 const coachGyms = document.querySelector('#coachGyms');
-const editProfilePhoto = document.querySelector('#editProfilePhoto');
 const profilePreview = document.querySelector('#profilePreview');
-const certificatePhotoInput = document.querySelector('#certificatePhotoInput');
-const coachCertificates = document.querySelector('#coachCertificates');
-const certificateUpload = document.querySelector('#certificateUpload');
-
 
 async function initApp() {
 	try {
@@ -22,8 +17,9 @@ async function initApp() {
     showCoachCourseCategories(coachData.course_categories, coachCourseCategories);
     showCoachGyms(coachData.gyms, coachGyms);
     editCoachForm();
-    // editCityForm();
-    // editCourseCategoryForm();
+    // editCertificateForm();
+    editCityForm();
+    editCourseCategoryForm();
 	} catch (error) {
     console.error(error);
     showLoginForm()
@@ -108,7 +104,7 @@ document.querySelector('#showRegisterForm').addEventListener('click', () => {
   window.location.href = '/coach/register'
 });
 
-// Edit form----------------------
+// Edit Form----------------------
 function editCoachForm() {
   const editCoachButton = document.querySelector('#editCoachButton');
   const saveCoachButton = document.querySelector('#saveCoachButton');
@@ -183,6 +179,201 @@ function editCoachForm() {
     } catch (error) {
       console.error('更新失敗:', error);
       alert('更新失敗。請再試一次。');
+    }
+  });
+}
+
+// Edit City
+async function editCityForm() {
+  const editCitiesButton = document.querySelector('#editCities');
+  const editCitiesModal = document.querySelector('#editCitiesModal');
+  const citiesSelect = document.querySelector('#citiesSelect');
+  const selectedCitiesList = document.querySelector('#selectedCitiesList');
+  const updateCitiesButton = document.querySelector('#updateCitiesButton');
+  const cancelCitiesButton = document.querySelector('#cancelCitiesButton');
+
+  let cities = [];
+  let selectedCities = [];
+
+  function updateSelectedCitiesList() {
+    selectedCitiesList.innerHTML = ''; // 清空列表
+    selectedCities.forEach(city => {
+      const span = document.createElement('span');
+      span.textContent = city.name;
+      span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '×';
+      removeButton.classList.add('ml-2', 'text-red-500', 'font-bold');
+      removeButton.onclick = function() {
+        selectedCities = selectedCities.filter(c => c.id !== city.id);
+        updateSelectedCitiesList();
+        citiesSelect.value = ''; // 重置 select
+      };
+
+      span.appendChild(removeButton);
+      selectedCitiesList.appendChild(span);
+    });
+  }
+
+  // 下拉選單
+  editCitiesButton.addEventListener('click', async () => {
+    editCitiesModal.classList.remove('hidden');
+    try {
+      cities = await fetchCities();
+
+      // 產生選單
+      citiesSelect.innerHTML = '<option value="">選擇城市</option>';
+      cities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city.id.toString();
+        option.textContent = city.name;
+        citiesSelect.appendChild(option);
+      });
+
+      // 預選目前有勾選的縣市
+      const currentUserCities = Array.from(coachCities.children).map(span => span.textContent);
+      selectedCities = cities.filter(city => currentUserCities.includes(city.name));
+      updateSelectedCitiesList();
+    } catch (error) {
+      console.error('後台連線失敗:', error);
+      alert('無法獲取城市選單，請稍後再試。');
+    }
+  });
+
+  // 當所選的城市 id 對應 cities 陣列，如果有在清單中，且沒有出現在已選清單，就選起來
+  citiesSelect.addEventListener('change', function() {
+    const selectedCityId = this.value;
+    const selectedCity = cities.find(city => city.id.toString() === selectedCityId);
+    if (selectedCity && !selectedCities.some(city => city.id === selectedCity.id)) {
+      selectedCities.push(selectedCity);
+      updateSelectedCitiesList();
+    }
+    this.value = '';
+  });
+
+  editCitiesModal.addEventListener('click', (event) => {
+    if (event.target === editCitiesModal) {
+      editCitiesModal.classList.add('hidden');
+    }
+  });
+
+  cancelCitiesButton.addEventListener('click', () => {
+    editCitiesModal.classList.add('hidden');
+  });
+
+  updateCitiesButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const url = "/coach_city";
+
+    try {
+      const updatedCoachData = await auth.updateCoachCities(selectedCities.map(city => city.name), url); // 先將 city.name 輸出成 array，在發送 PUT 到後端
+      if (updatedCoachData) {
+        coachCities.innerHTML = '';
+        showCoachCities(updatedCoachData.cities, coachCities);
+        editCitiesModal.classList.add('hidden');
+        alert('城市更新成功！');
+      }
+    } catch (error) {
+      console.error('更新失敗:', error);
+      alert('更新失敗。');
+    }
+  });
+}
+
+// Edit CourseCategory--------------------------------
+async function editCourseCategoryForm() {
+  const editCourseCategoriesButton = document.querySelector('#editCourseCategories');
+  const editCourseCategoriesModal = document.querySelector('#editCourseCategoriesModal');
+  const courseCategoriesSelect = document.querySelector('#courseCategoriesSelect');
+  const selectedCourseCategoriesList = document.querySelector('#selectedCourseCategoriesList');
+  const updateCourseCategoriesButton = document.querySelector('#updateCourseCategoriesButton');
+  const cancelCourseCategoriesButton = document.querySelector('#cancelCourseCategoriesButton');
+
+  let courseCategories = [];
+  let selectedCourseCategories = [];
+
+  function updateSelectedCourseCategoriesList() {
+    selectedCourseCategoriesList.innerHTML = ''; // 清空列表
+    selectedCourseCategories.forEach(courseCategory => {
+      const span = document.createElement('span');
+      span.textContent = courseCategory.name;
+      span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '×';
+      removeButton.classList.add('ml-2', 'text-red-500', 'font-bold');
+      removeButton.onclick = function() {
+        selectedCourseCategories = selectedCourseCategories.filter(c => c.id !== courseCategory.id);
+        updateSelectedCourseCategoriesList();
+        courseCategoriesSelect.value = ''; // 重置 select
+      };
+
+      span.appendChild(removeButton);
+      selectedCourseCategoriesList.appendChild(span);
+    });
+  }
+
+  // 下拉選單
+  editCourseCategoriesButton.addEventListener('click', async () => {
+    editCourseCategoriesModal.classList.remove('hidden');
+    try {
+      courseCategories = await fetchCourseCategories();
+
+      // 產生選單
+      courseCategoriesSelect.innerHTML = '<option value="">選擇課程</option>';
+      courseCategories.forEach(courseCategory => {
+        const option = document.createElement('option');
+        option.value = courseCategory.id.toString();
+        option.textContent = courseCategory.name;
+        courseCategoriesSelect.appendChild(option);
+      });
+
+      // 預選目前有勾選的課程
+      const currentUserCourseCategories = Array.from(coachCourseCategories.children).map(span => span.textContent);
+        selectedCourseCategories = courseCategories.filter(courseCategory => currentUserCourseCategories.includes(courseCategory.name));
+        updateSelectedCourseCategoriesList();
+    } catch (error) {
+      console.error('後台連線失敗:', error);
+      alert('無法獲取課程種類選單，請稍後再試。');
+    }
+
+    courseCategoriesSelect.addEventListener('change', function() {
+      const selectedCourseCatrgoryId = this.value;
+      const selectedCourseCatrgory = courseCategories.find(courseCategory => courseCategory.id.toString() === selectedCourseCatrgoryId);
+      if (selectedCourseCatrgory && !selectedCourseCategories.some(courseCategory => courseCategory.id === selectedCourseCatrgory.id)) {
+        selectedCourseCategories.push(selectedCourseCatrgory);
+        updateSelectedCourseCategoriesList();
+      }
+      this.value = '';
+    });
+  });
+
+  editCourseCategoriesModal.addEventListener('click', (event) => {
+    if (event.target === editCourseCategoriesModal) {
+      editCourseCategoriesModal.classList.add('hidden');
+    }
+  });
+
+  cancelCourseCategoriesButton.addEventListener('click', () => {
+    editCourseCategoriesModal.classList.add('hidden');
+  });
+
+  updateCourseCategoriesButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const url = "/coach_course_category";
+
+    try {
+      const updatedCoachData = await auth.updateCoachCourseCategories(selectedCourseCategories.map(courseCategory => courseCategory.name), url); // 先將 courseCategory.name 輸出成 array，在發送 PUT 到後端
+      if (updatedCoachData) {
+        coachCourseCategories.innerHTML = '';
+        showCoachCourseCategories(updatedCoachData.course_categories, coachCourseCategories);
+        editCourseCategoriesModal.classList.add('hidden');
+        alert('課程種類更新成功！');
+      }
+    } catch (error) {
+      console.error('更新失敗:', error);
+      alert('更新失敗。');
     }
   });
 }

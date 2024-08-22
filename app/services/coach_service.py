@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, or_
 from typing import Optional
 from app.models import CourseCategory, City, Coach
-from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachUpdate, CoachProfilePhotoPassport
+from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachCitiesUpdate, CoachProfilePhotoPassport, CoachCourseCategoriessUpdate
 from app.helpers.password_hash import get_password_hash
 from app.services.coach_auth_service import CoachAuthService
 from fastapi import HTTPException
@@ -10,6 +10,7 @@ import jwt
 from app.settings.config import settings
 from app.helpers.upload_image import upload_image
 import logging
+from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger()
 
@@ -129,5 +130,77 @@ class CoachService:
                 email=coach.email
             )
         except Exception as e:
+            await self.db.rollback()
             logger.error(f"Unexpected error during coach verification: {e}")
             raise HTTPException(status_code=401, detail=f"str{e}")
+
+    async def update_coach_cities(self, coach_id: int, coach_data: CoachCitiesUpdate) -> CoachCitiesUpdate:
+        try:
+            query = (
+                select(Coach)
+                .options(
+                    selectinload(Coach.cities),
+                )
+                .where(Coach.id == coach_id)
+            )
+            result = await self.db.execute(query)
+            coach = result.scalar_one_or_none()
+
+            if not coach:
+                raise ValueError("Coach not found")
+
+            if coach_data.cities is not None:
+                city_query = select(City).where(City.name.in_(coach_data.cities))
+                cities_result = await self.db.execute(city_query)
+                cities = cities_result.scalars().all()
+
+            # 檢查是否混入名單外城市資料
+            valid_city_names = {city.name for city in cities}
+            invalid_cities = set(coach_data.cities) - valid_city_names
+            if invalid_cities:
+                raise ValueError(f"Invalid cities: {', '.join(invalid_cities)}")
+
+            coach.cities = cities
+
+            await self.db.commit()
+
+            return CoachCitiesUpdate(
+                cities=[city.name for city in coach.cities]
+            )
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error in update_coach: {str(e)}")
+            raise
+
+    async def update_coach_course_categories(self, coach_id: int, coach_data: CoachCourseCategoriessUpdate) -> CoachCourseCategoriessUpdate:
+        try:
+            query = (
+                select(Coach)
+                .options(
+                    selectinload(Coach.course_categories),
+                )
+                .where(Coach.id == coach_id)
+            )
+            result = await self.db.execute(query)
+            coach = result.scalar_one_or_none()
+
+            if not coach:
+                raise ValueError("Coach not found")
+
+            if coach_data.course_categories is not None:
+                course_category_query = select(CourseCategory).where(CourseCategory.name.in_(coach_data.course_categories))
+                course_categories_result = await self.db.execute(course_category_query)
+                course_categories = course_categories_result.scalars().all()
+
+            coach.course_categories = course_categories
+
+            await self.db.commit()
+
+            return CoachCourseCategoriessUpdate(
+                course_categories=[course_category.name for course_category in coach.course_categories]
+            )
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error in update_coach: {str(e)}")
+            raise
+

@@ -117,6 +117,41 @@ class CoachAuth {
 			throw error;
 		}
 	}
+
+	async updateCoachCities(cities, url) {
+    if (!Array.isArray(cities)) {
+      throw new Error('格式錯誤(要是 Array)');
+    }
+    return this._sendUpdateRequest({ cities }, url);
+  }
+
+  async updateCoachCourseCategories(courseCategories, url) {
+    if (!Array.isArray(courseCategories)) {
+      throw new Error('格式錯誤(要是 Array)');
+    }
+    return this._sendUpdateRequest({ course_categories: courseCategories }, url);
+	}
+
+	async _sendUpdateRequest(updateData, url) {
+    if (Object.keys(updateData).length === 0) {
+      return null;
+    }
+
+    const response = await fetch(`${this.baseUrl}${url}`, {
+      method: 'PUT',
+      headers: {
+        "Authorization": `Bearer ${this.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      throw new Error(response.status);
+    }
+
+    return await response.json();
+  }
 }
 
 export default CoachAuth;

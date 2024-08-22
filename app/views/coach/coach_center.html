@@ -123,6 +123,8 @@
       <button class="text-white rounded">登出</button>
     </div>
   </main>
+  {% include 'edit_city.html' %}
+  {% include 'edit_course_category.html' %}
   {% include 'coach/navbar.html' %}
   <script type="module" src="{{ url_for('static', path='/js/coach/coachCenter.js') }}"></script>
 {% endblock %}
