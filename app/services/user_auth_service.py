@@ -59,7 +59,7 @@ class UserAuthService:
                 id=user.id,
                 name=user.name,
                 email=user.email,
-                cities=[city.name for city in user.cities],
+                cities=[{"city_id":city.id, "city_name":city.name} for city in user.cities],
                 course_categories=[category.name for category in user.course_categories],
                 coaches=[{"coach_name":coach.name, "coach_id":coach.id, "coach_account":coach.account, "coach_profile_photo": coach.profile_photo} for coach in user.coaches]
             )

@@ -132,6 +132,13 @@ class CoachAuth {
     return this._sendUpdateRequest({ course_categories: courseCategories }, url);
 	}
 
+	async updateCoachGyms(gyms, url) {
+    if (!Array.isArray(gyms)) {
+      throw new Error('格式錯誤(要是 Array)');
+    }
+    return this._sendUpdateRequest({ gyms }, url);
+	}
+
 	async _sendUpdateRequest(updateData, url) {
     if (Object.keys(updateData).length === 0) {
       return null;

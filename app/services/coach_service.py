@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select, or_
 from typing import Optional
-from app.models import CourseCategory, City, Coach
-from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachCitiesUpdate, CoachProfilePhotoPassport, CoachCourseCategoriessUpdate
+from app.models import CourseCategory, City, Coach, Gym
+from app.schemas import CoachCreate, CheckCity, CheckCourseCategory, CoachRead, CoachPassport, CoachCitiesUpdate, CoachProfilePhotoPassport, CoachCourseCategoriesUpdate, CoachGymsUpdate, CoachGymsRead
 from app.helpers.password_hash import get_password_hash
 from app.services.coach_auth_service import CoachAuthService
 from fastapi import HTTPException
@@ -172,7 +172,7 @@ class CoachService:
             print(f"Error in update_coach: {str(e)}")
             raise
 
-    async def update_coach_course_categories(self, coach_id: int, coach_data: CoachCourseCategoriessUpdate) -> CoachCourseCategoriessUpdate:
+    async def update_coach_course_categories(self, coach_id: int, coach_data: CoachGymsRead) -> CoachCourseCategoriesUpdate:
         try:
             query = (
                 select(Coach)
@@ -196,8 +196,41 @@ class CoachService:
 
             await self.db.commit()
 
-            return CoachCourseCategoriessUpdate(
+            return CoachCourseCategoriesUpdate(
                 course_categories=[course_category.name for course_category in coach.course_categories]
+            )
+        except Exception as e:
+            await self.db.rollback()
+            print(f"Error in update_coach: {str(e)}")
+            raise
+
+
+    async def update_coach_gyms(self, coach_id: int, coach_data: CoachGymsUpdate) -> CoachGymsUpdate:
+        try:
+            query = (
+                select(Coach)
+                .options(
+                    selectinload(Coach.gyms),
+                )
+                .where(Coach.id == coach_id)
+            )
+            result = await self.db.execute(query)
+            coach = result.scalar_one_or_none()
+
+            if not coach:
+                raise ValueError("Coach not found")
+
+            if coach_data.gyms is not None:
+                gym_query = select(Gym).where(Gym.id.in_(coach_data.gyms))
+                gyms_result = await self.db.execute(gym_query)
+                gyms = gyms_result.scalars().all()
+
+            coach.gyms = gyms
+
+            await self.db.commit()
+
+            return CoachGymsUpdate(
+                gyms=[{"id": gym.id, "name": gym.name, "address": gym.address} for gym in coach.gyms]
             )
         except Exception as e:
             await self.db.rollback()

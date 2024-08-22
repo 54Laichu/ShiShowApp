@@ -113,8 +113,8 @@ class CoachAuthService:
                 email=coach.email,
                 account=coach.account,
                 certificates=[certificate.name for certificate in coach.certificates],
-                cities=[city.name for city in coach.cities],
-                gyms=[{"name": gym.name, "address": gym.address} for gym in coach.gyms],
+                cities=[{"city_id":city.id, "city_name":city.name}  for city in coach.cities],
+                gyms=[{"id": gym.id, "name": gym.name, "address": gym.address} for gym in coach.gyms],
                 course_categories=[category.name for category in coach.course_categories]
             )
             return coach_read

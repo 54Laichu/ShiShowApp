@@ -18,6 +18,7 @@ async function initApp() {
     showCoachGyms(coachData.gyms, coachGyms);
     editCoachForm();
     // editCertificateForm();
+    editGymForm(coachData.cities);
     editCityForm();
     editCourseCategoryForm();
 	} catch (error) {
@@ -46,8 +47,8 @@ function showCoachCities(citiesArray, container) {
   citiesArray.forEach(city => {
     const cityElement = document.createElement('span');
     cityElement.classList.add('bg-green-100', 'text-green-800', 'px-3', 'py-1', 'rounded-full', 'text-sm');
-		cityElement.value = city;
-		cityElement.textContent = city;
+		cityElement.value = city.city_id;
+		cityElement.textContent = city.city_name;
 		container.appendChild(cityElement);
 	});
 }
@@ -376,6 +377,139 @@ async function editCourseCategoryForm() {
       alert('更新失敗。');
     }
   });
+}
+
+async function editGymForm(cities) {
+  console.log(cities);
+  const editGymsButton = document.querySelector('#editGyms');
+  const editGymsModal = document.querySelector('#editGymsModal');
+  const gymCitiesSelect = document.querySelector('#gymCitiesSelect');
+  const gymsSelect = document.querySelector('#gymsSelect');
+  const selectedGymsList = document.querySelector('#selectedGymsList');
+  const updateGymsButton = document.querySelector('#updateGymsButton');
+  const cancelGymsButton = document.querySelector('#cancelGymsButton');
+
+  let gyms = [];
+  let selectedGyms = [];
+
+  async function fetchGyms(cityId) {
+    try {
+      const response = await fetch(`${window.location.origin}/api/v1/gyms?city_id=${cityId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch gyms');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching gyms:', error);
+      alert('系統異常，請稍後再試。');
+      return [];
+    }
+  }
+
+  function updateSelectedGymsList() {
+    selectedGymsList.innerHTML = '';
+    selectedGyms.forEach(gym => {
+      const span = document.createElement('span');
+      span.textContent = gym.name;
+      span.classList.add('bg-gray-200', 'px-2', 'py-1', 'rounded', 'inline-block', 'mr-2', 'mb-2');
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '×';
+      removeButton.classList.add('ml-2', 'text-red-500', 'font-bold');
+      removeButton.onclick = function() {
+        selectedGyms = selectedGyms.filter(g => g.id !== gym.id);
+        updateSelectedGymsList();
+      };
+
+      span.appendChild(removeButton);
+      selectedGymsList.appendChild(span);
+    });
+  }
+
+  editGymsButton.addEventListener('click', () => {
+    editGymsModal.classList.remove('hidden');
+    populateCitiesSelect();
+  });
+
+  function populateCitiesSelect() {
+    gymCitiesSelect.innerHTML = '<option value="">選擇城市</option>';
+    cities.forEach(city => {
+      const option = document.createElement('option');
+      option.value = city.city_id.toString();
+      option.textContent = city.city_name;
+      gymCitiesSelect.appendChild(option);
+    });
+  }
+
+  gymCitiesSelect.addEventListener('change', async function() {
+    const selectedCityId = this.value;
+    if (selectedCityId) {
+      gyms = await fetchGyms(selectedCityId);
+      populateGymsSelect();
+    } else {
+      gymsSelect.innerHTML = '<option value="">選擇場館</option>';
+    }
+  });
+
+  function populateGymsSelect() {
+    gymsSelect.innerHTML = '<option value="">選擇場館</option>';
+    gyms.forEach(gym => {
+      const option = document.createElement('option');
+      option.value = gym.id.toString();
+      option.textContent = `${gym.name} ｜ 地址：${gym.address}`;
+      gymsSelect.appendChild(option);
+    });
+  }
+
+  gymsSelect.addEventListener('change', function() {
+    const selectedGymId = this.value;
+    const selectedGym = gyms.find(gym => gym.id.toString() === selectedGymId);
+    if (selectedGym && !selectedGyms.some(gym => gym.id === selectedGym.id)) {
+      selectedGyms.push(selectedGym);
+      updateSelectedGymsList();
+    }
+    this.value = '';
+  });
+
+  editGymsModal.addEventListener('click', (event) => {
+    if (event.target === editGymsModal) {
+      editGymsModal.classList.add('hidden');
+    }
+  });
+
+  cancelGymsButton.addEventListener('click', () => {
+    editGymsModal.classList.add('hidden');
+  });
+
+  updateGymsButton.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const url = "/coach_gym";
+
+    try {
+      const updatedCoachData = await auth.updateCoachGyms(selectedGyms.map(gym => gym.id), url);
+      if (updatedCoachData) {
+        updateCoachGymsList(updatedCoachData.gyms, coachGyms);
+        editGymsModal.classList.add('hidden');
+        console.log(updatedCoachData);
+        alert('場館更新成功！');
+      }
+    } catch (error) {
+      console.error('更新失敗:', error);
+      alert('更新失敗。');
+    }
+  });
+
+  function updateCoachGymsList(gymsArray, container) {
+    const coachGymsElement = document.querySelector('#coachGyms');
+    coachGymsElement.innerHTML = '';
+    gymsArray.forEach(gym => {
+      const gymElement = document.createElement('span');
+      gymElement.classList.add('bg-green-100', 'text-green-800', 'px-3', 'py-1', 'rounded-full', 'text-sm');
+      gymElement.value = gym.name;
+      gymElement.textContent = `${gym.name}   ｜地址： ${gym.address}`;
+      container.appendChild(gymElement);
+    });
+  }
 }
 
 initApp();

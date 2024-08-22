@@ -50,8 +50,17 @@ class CoachCitiesUpdate(SQLModel):
     class Config:
         orm_mode = True
 
-class CoachCourseCategoriessUpdate(SQLModel):
+class CoachCourseCategoriesUpdate(SQLModel):
     course_categories: List[str]
+
+    class Config:
+        orm_mode = True
+
+class CoachGymsRead(SQLModel):
+    gyms: List[int]
+
+class CoachGymsUpdate(SQLModel):
+    gyms: List[dict]
 
     class Config:
         orm_mode = True
@@ -85,7 +94,7 @@ class UserRead(SQLModel):
     id: int
     name: str
     email: str
-    cities: Optional[List[str]] = None
+    cities: Optional[List[dict]] = None
     course_categories: Optional[List[str]] = None
     coaches: Optional[List[dict]] = None
 
@@ -99,7 +108,7 @@ class CoachRead(SQLModel):
     account: str
     email: str
     certificates: Optional[List[str]] = None
-    cities: Optional[List[str]] = None
+    cities: Optional[List[dict]] = None
     course_categories: Optional[List[str]] = None
     gyms: Optional[List[dict]] = None
 
@@ -133,6 +142,11 @@ class CourseCategoryRead(SQLModel):
 class CityRead(SQLModel):
     id: int
     name: str
+
+class GymRead(SQLModel):
+    id: int
+    name: str
+    address: str
 
 class CheckCity(Enum):
     TPE = "臺北市"

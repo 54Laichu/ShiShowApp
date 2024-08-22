@@ -83,7 +83,7 @@
     </section>
 
 
-    <!-- coach cities -->
+    <!-- coach gyms -->
     <section class="bg-white rounded-lg shadow-md p-6 mb-8">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">可上課健身房</h2>
@@ -125,6 +125,7 @@
   </main>
   {% include 'edit_city.html' %}
   {% include 'edit_course_category.html' %}
+  {% include 'edit_gym.html' %}
   {% include 'coach/navbar.html' %}
   <script type="module" src="{{ url_for('static', path='/js/coach/coachCenter.js') }}"></script>
 {% endblock %}

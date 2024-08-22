@@ -33,8 +33,8 @@ function showUserCities(citiesArray, container) {
   citiesArray.forEach(city => {
     const cityElement = document.createElement('span');
     cityElement.classList.add('bg-green-100', 'text-green-800', 'px-3', 'py-1', 'rounded-full', 'text-sm');
-		cityElement.value = city;
-		cityElement.textContent = city;
+		cityElement.value = city.city_id;
+		cityElement.textContent = city.city_name;
 		container.appendChild(cityElement);
 	});
 }
